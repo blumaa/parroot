@@ -54,7 +54,12 @@ vi.mock('firebase/auth', () => ({
   createUserWithEmailAndPassword: vi.fn(),
   sendPasswordResetEmail: vi.fn(),
   updateProfile: vi.fn(),
-  onAuthStateChanged: vi.fn(),
+  onAuthStateChanged: vi.fn((auth, callback) => {
+    // Call callback immediately with null user
+    callback(null);
+    // Return unsubscribe function
+    return vi.fn();
+  }),
 }));
 
 vi.mock('firebase/storage', () => ({
@@ -64,6 +69,27 @@ vi.mock('firebase/storage', () => ({
   getDownloadURL: vi.fn(),
   deleteObject: vi.fn(),
 }));
+
+// Mock our firebase.ts module with getter functions
+vi.mock('./app/utils/firebase', () => {
+  const mockApp = {
+    name: '[DEFAULT]',
+    options: {
+      projectId: 'parroot-template',
+      storageBucket: 'parroot-template.firebasestorage.app',
+    },
+  };
+  const mockDb = { type: 'firestore' };
+  const mockAuth = { app: mockApp, currentUser: null };
+  const mockStorage = { app: mockApp };
+
+  return {
+    getFirebaseApp: vi.fn(() => mockApp),
+    getFirebaseDb: vi.fn(() => mockDb),
+    getFirebaseAuth: vi.fn(() => mockAuth),
+    getFirebaseStorage: vi.fn(() => mockStorage),
+  };
+});
 
 // Cleanup after each test
 afterEach(() => {

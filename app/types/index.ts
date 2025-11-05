@@ -67,7 +67,7 @@ export interface Segment {
   id: string;
   name: string; // User-friendly name like "Summer Sale Carousel"
   type: SegmentType;
-  props: Record<string, any>; // Type-specific props
+  props: Record<string, unknown>; // Type-specific props
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -217,7 +217,7 @@ export interface Media {
 export interface FormSubmission {
   id: string;
   formType: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   submittedAt: Timestamp;
   read: boolean;
   emailSent: boolean;

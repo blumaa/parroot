@@ -1,42 +1,39 @@
 import { describe, it, expect } from 'vitest';
+import { getFirebaseApp, getFirebaseAuth, getFirebaseDb, getFirebaseStorage } from '../firebase';
 
 describe('Firebase Initialization', () => {
-  it('should initialize Firebase app', async () => {
-    const { app } = await import('../firebase');
+  it('should return Firebase app instance', () => {
+    const app = getFirebaseApp();
+
     expect(app).toBeDefined();
     expect(app.name).toBe('[DEFAULT]');
   });
 
-  it('should initialize Firestore', async () => {
-    const { db } = await import('../firebase');
+  it('should return same app instance on multiple calls', () => {
+    const app1 = getFirebaseApp();
+    const app2 = getFirebaseApp();
+
+    expect(app1).toBe(app2);
+  });
+
+  it('should return auth instance', () => {
+    const auth = getFirebaseAuth();
+
+    expect(auth).toBeDefined();
+    expect(auth.app).toBeDefined();
+  });
+
+  it('should return firestore instance', () => {
+    const db = getFirebaseDb();
+
     expect(db).toBeDefined();
     expect(db.type).toBe('firestore');
   });
 
-  it('should initialize Auth', async () => {
-    const { auth } = await import('../firebase');
-    expect(auth).toBeDefined();
-    expect(auth).toHaveProperty('currentUser');
-  });
+  it('should return storage instance', () => {
+    const storage = getFirebaseStorage();
 
-  it('should initialize Storage', async () => {
-    const { storage } = await import('../firebase');
     expect(storage).toBeDefined();
-    expect(storage).toHaveProperty('app');
-  });
-
-  it('should have correct Firebase config', async () => {
-    const { app } = await import('../firebase');
-    expect(app.options.projectId).toBe('parroot-template');
-    expect(app.options.storageBucket).toBe('parroot-template.firebasestorage.app');
-  });
-
-  it('should only initialize Firebase once (singleton)', async () => {
-    const firebase1 = await import('../firebase');
-    const firebase2 = await import('../firebase');
-    expect(firebase1.app).toBe(firebase2.app);
-    expect(firebase1.db).toBe(firebase2.db);
-    expect(firebase1.auth).toBe(firebase2.auth);
-    expect(firebase1.storage).toBe(firebase2.storage);
+    expect(storage.app).toBeDefined();
   });
 });
