@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User as FirebaseUser, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../utils/firebase';
+import { getAuthInstance } from '../utils/firebase';
 import { User, UserRole } from '../types';
 import { getCurrentUser } from '../utils/auth';
 
@@ -28,6 +28,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Initialize auth only in browser
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const auth = getAuthInstance();
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
 

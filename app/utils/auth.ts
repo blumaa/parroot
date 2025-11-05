@@ -6,7 +6,7 @@ import {
   User as FirebaseUser,
   updateProfile,
 } from 'firebase/auth';
-import { auth } from './firebase';
+import { getAuthInstance } from './firebase';
 import { createDocument, getDocument, getUserByEmail } from './firestore';
 import { User, UserRole } from '../types';
 
@@ -19,6 +19,7 @@ import { User, UserRole } from '../types';
  */
 export async function signIn(email: string, password: string): Promise<FirebaseUser> {
   try {
+    const auth = getAuthInstance();
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return userCredential.user;
   } catch (error) {
@@ -32,6 +33,7 @@ export async function signIn(email: string, password: string): Promise<FirebaseU
  */
 export async function signOut(): Promise<void> {
   try {
+    const auth = getAuthInstance();
     await firebaseSignOut(auth);
   } catch (error) {
     console.error('Error signing out:', error);
@@ -49,6 +51,7 @@ export async function createUser(
   role: UserRole
 ): Promise<string> {
   try {
+    const auth = getAuthInstance();
     // Create Firebase Auth user
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const { uid } = userCredential.user;
@@ -76,6 +79,7 @@ export async function createUser(
  */
 export async function resetPassword(email: string): Promise<void> {
   try {
+    const auth = getAuthInstance();
     await sendPasswordResetEmail(auth, email);
   } catch (error) {
     console.error('Error sending password reset email:', error);
@@ -88,6 +92,7 @@ export async function resetPassword(email: string): Promise<void> {
  */
 export async function getCurrentUserRole(): Promise<UserRole | null> {
   try {
+    const auth = getAuthInstance();
     const currentUser = auth.currentUser;
     if (!currentUser) return null;
 
@@ -120,6 +125,7 @@ export async function isEditor(): Promise<boolean> {
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
+    const auth = getAuthInstance();
     const currentUser = auth.currentUser;
     if (!currentUser) return null;
 

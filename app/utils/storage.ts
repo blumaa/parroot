@@ -5,7 +5,7 @@ import {
   deleteObject,
   UploadMetadata,
 } from 'firebase/storage';
-import { storage } from './firebase';
+import { getStorageInstance } from './firebase';
 import { createDocument, deleteDocument } from './firestore';
 import { Media } from '../types';
 
@@ -28,6 +28,7 @@ export async function uploadImage(
     const filePath = `${folder}/${filename}`;
 
     // Create storage reference
+    const storage = getStorageInstance();
     const storageRef = ref(storage, filePath);
 
     // Upload file
@@ -61,6 +62,7 @@ export async function uploadImage(
 export async function deleteImage(url: string, mediaId?: string): Promise<void> {
   try {
     // Delete from Storage
+    const storage = getStorageInstance();
     const storageRef = ref(storage, url);
     await deleteObject(storageRef);
 

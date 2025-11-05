@@ -12,22 +12,73 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-let app: FirebaseApp;
-let db: Firestore;
-let auth: Auth;
-let storage: FirebaseStorage;
+let app: FirebaseApp | undefined;
+let db: Firestore | undefined;
+let auth: Auth | undefined;
+let storage: FirebaseStorage | undefined;
 
-if (getApps().length === 0) {
-  app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-  auth = getAuth(app);
-  storage = getStorage(app);
-} else {
-  app = getApps()[0];
-  db = getFirestore(app);
-  auth = getAuth(app);
-  storage = getStorage(app);
+/**
+ * Initialize Firebase app (lazy initialization)
+ * Only runs in browser environment and on first call
+ */
+function initializeFirebase(): FirebaseApp {
+  // Only initialize in browser environment
+  if (typeof window === 'undefined') {
+    throw new Error('Firebase can only be initialized in the browser');
+  }
+
+  if (getApps().length === 0) {
+    app = initializeApp(firebaseConfig);
+  } else {
+    app = getApps()[0];
+  }
+
+  return app;
 }
 
-export { app, db, auth, storage };
+/**
+ * Get Firebase app instance (initializes on first call)
+ */
+export function getApp(): FirebaseApp {
+  if (!app) {
+    app = initializeFirebase();
+  }
+  return app;
+}
+
+/**
+ * Get Firestore instance (initializes on first call)
+ */
+export function getDb(): Firestore {
+  if (!db) {
+    const firebaseApp = getApp();
+    db = getFirestore(firebaseApp);
+  }
+  return db;
+}
+
+/**
+ * Get Auth instance (initializes on first call)
+ */
+export function getAuthInstance(): Auth {
+  if (!auth) {
+    const firebaseApp = getApp();
+    auth = getAuth(firebaseApp);
+  }
+  return auth;
+}
+
+/**
+ * Get Storage instance (initializes on first call)
+ */
+export function getStorageInstance(): FirebaseStorage {
+  if (!storage) {
+    const firebaseApp = getApp();
+    storage = getStorage(firebaseApp);
+  }
+  return storage;
+}
+
+// Legacy exports for backward compatibility (used by tests)
+// These export the getter functions themselves, not the values
+export { getApp as app, getDb as db, getAuthInstance as auth, getStorageInstance as storage };

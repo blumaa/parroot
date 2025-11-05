@@ -16,7 +16,7 @@ import {
   WhereFilterOp,
   OrderByDirection,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { getDb } from './firebase';
 
 // ============================================
 // GENERIC CRUD OPERATIONS
@@ -30,6 +30,7 @@ export async function getDocument<T>(
   documentId: string
 ): Promise<T | null> {
   try {
+    const db = getDb();
     const docRef = doc(db, collectionName, documentId);
     const docSnap = await getDoc(docRef);
 
@@ -51,6 +52,7 @@ export async function getAllDocuments<T>(
   constraints: QueryConstraint[] = []
 ): Promise<T[]> {
   try {
+    const db = getDb();
     const collectionRef = collection(db, collectionName);
     const q = constraints.length > 0 ? query(collectionRef, ...constraints) : collectionRef;
     const querySnapshot = await getDocs(q);
@@ -80,6 +82,7 @@ export async function queryDocuments<T>(
   limitCount?: number
 ): Promise<T[]> {
   try {
+    const db = getDb();
     const collectionRef = collection(db, collectionName);
     const constraints: QueryConstraint[] = [];
 
@@ -119,6 +122,7 @@ export async function createDocument<T>(
   data: Omit<T, 'id'>
 ): Promise<string> {
   try {
+    const db = getDb();
     const collectionRef = collection(db, collectionName);
     const docRef = await addDoc(collectionRef, {
       ...data,
@@ -141,6 +145,7 @@ export async function updateDocument<T>(
   data: Partial<Omit<T, 'id'>>
 ): Promise<void> {
   try {
+    const db = getDb();
     const docRef = doc(db, collectionName, documentId);
     await updateDoc(docRef, {
       ...data,
@@ -160,6 +165,7 @@ export async function deleteDocument(
   documentId: string
 ): Promise<void> {
   try {
+    const db = getDb();
     const docRef = doc(db, collectionName, documentId);
     await deleteDoc(docRef);
   } catch (error) {
