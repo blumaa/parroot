@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isEditor() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'editor' ||
+              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+    
+    // Pages - public read, admin/editor write
+    match /pages/{pageId} {
+      allow read: if true; // Public can read published pages
+      allow write: if isEditor();
+    }
+    
+    // Segments - public read, admin/editor write
+    match /segments/{segmentId} {
+      allow read: if true;
+      allow write: if isEditor();
+    }
+    
+    // Blog Posts - public read published posts, admin/editor write
+    match /blogPosts/{postId} {
+      allow read: if resource.data.status == 'published' || isEditor();
+      allow write: if isEditor();
+    }
+    
+    // Navigation - public read, admin/editor write
+    match /navigation/{navId} {
+      allow read: if true;
+      allow write: if isEditor();
+    }
+    
+    // Brand Configuration - public read, admin only write
+    match /brandConfiguration/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Users - admin only
+    match /users/{userId} {
+      allow read: if isAdmin() || request.auth.uid == userId;
+      allow write: if isAdmin();
+    }
+    
+    // Media - public read, admin/editor write
+    match /media/{mediaId} {
+      allow read: if true;
+      allow write: if isEditor();
+      allow delete: if isEditor() && resource.data.uploadedBy == request.auth.uid;
+    }
+    
+    // Form Submissions - admin/editor only
+    match /formSubmissions/{submissionId} {
+      allow read: if isEditor();
+      allow create: if true; // Public can submit forms
+      allow update, delete: if isEditor();
+    }
+    
+    // Site Settings - public read, admin only write
+    match /siteSettings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

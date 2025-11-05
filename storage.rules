@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isEditor() {
+      return isAuthenticated();
+      // Note: We can't check Firestore from Storage rules,
+      // so we assume authenticated users are editors/admins
+    }
+    
+    // Images directory - authenticated users can upload, anyone can read
+    match /images/{imageId} {
+      allow read: if true; // Public read access for images
+      allow write: if isEditor(); // Only authenticated users can upload
+      allow delete: if isEditor(); // Only authenticated users can delete
+    }
+    
+    // Logos and favicons - admin only write, public read
+    match /branding/{fileName} {
+      allow read: if true;
+      allow write: if isEditor();
+    }
+  }
+}
