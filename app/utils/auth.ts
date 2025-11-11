@@ -1,51 +1,68 @@
-import {
-  signInWithEmailAndPassword as firebaseSignIn,
-  signOut as firebaseSignOut,
-  createUserWithEmailAndPassword as firebaseCreateUser,
-  sendPasswordResetEmail as firebaseSendPasswordReset,
-  updateProfile as firebaseUpdateProfile,
-  onAuthStateChanged as firebaseOnAuthStateChanged,
-  User,
-  UserCredential,
-} from 'firebase/auth';
+import type { User, UserCredential } from 'firebase/auth';
 import { getFirebaseAuth } from './firebase';
 
 export async function signInUser(
   email: string,
   password: string
 ): Promise<UserCredential> {
-  const auth = getFirebaseAuth();
-  return firebaseSignIn(auth, email, password);
+  const { signInWithEmailAndPassword } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
+  return signInWithEmailAndPassword(auth, email, password);
 }
 
 export async function signOutUser(): Promise<void> {
-  const auth = getFirebaseAuth();
-  return firebaseSignOut(auth);
+  const { signOut } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
+  return signOut(auth);
 }
 
 export async function registerUser(
   email: string,
   password: string
 ): Promise<UserCredential> {
-  const auth = getFirebaseAuth();
-  return firebaseCreateUser(auth, email, password);
+  const { createUserWithEmailAndPassword } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
+  return createUserWithEmailAndPassword(auth, email, password);
 }
 
 export async function resetPassword(email: string): Promise<void> {
-  const auth = getFirebaseAuth();
-  return firebaseSendPasswordReset(auth, email);
+  const { sendPasswordResetEmail } = await import('firebase/auth');
+  const auth = await getFirebaseAuth();
+  return sendPasswordResetEmail(auth, email);
 }
 
 export async function updateUserProfile(
   user: User,
   profile: { displayName?: string; photoURL?: string }
 ): Promise<void> {
-  return firebaseUpdateProfile(user, profile);
+  const { updateProfile } = await import('firebase/auth');
+  return updateProfile(user, profile);
 }
 
 export function onAuthChange(
   callback: (user: User | null) => void
 ): () => void {
-  const auth = getFirebaseAuth();
-  return firebaseOnAuthStateChanged(auth, callback);
+  // Only initialize on client side
+  if (typeof window === 'undefined') {
+    return () => {}; // Return a no-op function for server-side
+  }
+
+  let unsubscribe: (() => void) | undefined;
+
+  // Async initialization
+  (async () => {
+    try {
+      const { onAuthStateChanged } = await import('firebase/auth');
+      const auth = await getFirebaseAuth();
+      unsubscribe = onAuthStateChanged(auth, callback);
+    } catch (error) {
+      console.error('Failed to initialize auth listener:', error);
+    }
+  })();
+
+  return () => {
+    if (unsubscribe) {
+      unsubscribe();
+    }
+  };
 }

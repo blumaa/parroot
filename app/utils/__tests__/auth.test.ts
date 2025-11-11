@@ -99,11 +99,15 @@ describe('Auth Utils', () => {
       const callback = vi.fn();
       const unsubscribe = onAuthChange(callback);
 
-      expect(onAuthStateChanged).toHaveBeenCalledWith(
-        expect.anything(),
-        callback
-      );
-      expect(unsubscribe).toBe(mockUnsubscribe);
+      // Wait for async initialization to complete
+      await vi.waitFor(() => {
+        expect(onAuthStateChanged).toHaveBeenCalledWith(
+          expect.anything(),
+          callback
+        );
+      });
+
+      expect(typeof unsubscribe).toBe('function');
     });
   });
 });

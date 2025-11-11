@@ -1,26 +1,19 @@
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  addDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  QueryConstraint,
-  DocumentData,
-} from 'firebase/firestore';
+import type { QueryConstraint, DocumentData, Firestore, DocumentReference } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import { getFirebaseDb } from './firebase';
+
+function parseDocPath(db: Firestore, path: string): DocumentReference {
+  const [collectionName, ...docIdParts] = path.split('/');
+  const docId = docIdParts.join('/');
+  return doc(db, collectionName, docId);
+}
 
 export async function getDocument(
   path: string
 ): Promise<DocumentData | null> {
-  const db = getFirebaseDb();
-  const pathParts = path.split('/');
-  const collectionName = pathParts[0];
-  const docId = pathParts.slice(1).join('/');
-  const docRef = doc(db, collectionName, docId);
+  const { getDoc } = await import('firebase/firestore');
+  const db = await getFirebaseDb();
+  const docRef = parseDocPath(db, path);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
@@ -32,7 +25,8 @@ export async function getDocument(
 export async function getCollection(
   collectionPath: string
 ): Promise<DocumentData[]> {
-  const db = getFirebaseDb();
+  const { collection, getDocs } = await import('firebase/firestore');
+  const db = await getFirebaseDb();
   const collectionRef = collection(db, collectionPath);
   const querySnapshot = await getDocs(collectionRef);
 
@@ -46,7 +40,8 @@ export async function addDocument(
   collectionPath: string,
   data: DocumentData
 ): Promise<string> {
-  const db = getFirebaseDb();
+  const { collection, addDoc } = await import('firebase/firestore');
+  const db = await getFirebaseDb();
   const collectionRef = collection(db, collectionPath);
   const docRef = await addDoc(collectionRef, data);
   return docRef.id;
@@ -56,11 +51,9 @@ export async function setDocument(
   path: string,
   data: DocumentData
 ): Promise<void> {
-  const db = getFirebaseDb();
-  const pathParts = path.split('/');
-  const collectionName = pathParts[0];
-  const docId = pathParts.slice(1).join('/');
-  const docRef = doc(db, collectionName, docId);
+  const { setDoc } = await import('firebase/firestore');
+  const db = await getFirebaseDb();
+  const docRef = parseDocPath(db, path);
   await setDoc(docRef, data);
 }
 
@@ -68,20 +61,16 @@ export async function updateDocument(
   path: string,
   data: Partial<DocumentData>
 ): Promise<void> {
-  const db = getFirebaseDb();
-  const pathParts = path.split('/');
-  const collectionName = pathParts[0];
-  const docId = pathParts.slice(1).join('/');
-  const docRef = doc(db, collectionName, docId);
+  const { updateDoc } = await import('firebase/firestore');
+  const db = await getFirebaseDb();
+  const docRef = parseDocPath(db, path);
   await updateDoc(docRef, data);
 }
 
 export async function deleteDocument(path: string): Promise<void> {
-  const db = getFirebaseDb();
-  const pathParts = path.split('/');
-  const collectionName = pathParts[0];
-  const docId = pathParts.slice(1).join('/');
-  const docRef = doc(db, collectionName, docId);
+  const { deleteDoc } = await import('firebase/firestore');
+  const db = await getFirebaseDb();
+  const docRef = parseDocPath(db, path);
   await deleteDoc(docRef);
 }
 
@@ -89,7 +78,8 @@ export async function queryCollection(
   collectionPath: string,
   constraints: QueryConstraint[]
 ): Promise<DocumentData[]> {
-  const db = getFirebaseDb();
+  const { collection, query, getDocs } = await import('firebase/firestore');
+  const db = await getFirebaseDb();
   const collectionRef = collection(db, collectionPath);
   const q = query(collectionRef, ...constraints);
   const querySnapshot = await getDocs(q);

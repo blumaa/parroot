@@ -1,38 +1,59 @@
-"use client";
-
+import { unstable_noStore as noStore } from 'next/cache';
 import { Box, Heading, Text, Button } from "@mond-design-system/theme";
+import { Header } from "./components/Header";
+import { getMenuItems } from "./utils/firestore-navigation";
+import { getPages } from "./utils/firestore-pages";
+import { getUser } from "./lib/dal";
+import { getSiteSettings } from "./utils/firestore-settings";
 
-export default function Home() {
+export default async function Home() {
+  // Opt out of caching for this request
+  noStore();
+
+  // Fetch navigation data, user, and settings for header
+  const [menuItems, pages, user, settings] = await Promise.all([
+    getMenuItems({ visible: true }),
+    getPages({ status: 'published' }),
+    getUser(),
+    getSiteSettings(),
+  ]);
+
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      padding={20}
-      style={{ minHeight: "100vh" }}
-    >
+    <>
+      <Header
+        menuItems={menuItems}
+        pages={pages}
+        user={user}
+        siteName={settings?.siteName}
+        logoUrl={settings?.logoUrl}
+      />
       <Box
+        as="main"
+        padding="20"
         display="flex"
         flexDirection="column"
         alignItems="center"
-        gap={10}
-        style={{ maxWidth: "800px" }}
+        justifyContent="center"
+        className="min-h-screen"
       >
-        <Heading size="4xl" semantic="primary" weight="bold">
-          Parroot Website Template
-        </Heading>
+        <Box display="flex" flexDirection="column" alignItems="center" className="max-w-3xl" padding="10">
+          <Heading level={1} size="4xl" semantic="primary" weight="bold">
+            Parroot Website Template
+          </Heading>
 
-        <Text size="lg" semantic="secondary" style={{ textAlign: "center" }}>
-          A flexible website template built on the Mond Design System with admin
-          capabilities for content management and brand customization.
-        </Text>
+          <Box marginTop="6" marginBottom="10">
+            <Text variant="body" semantic="secondary" align="center">
+              A flexible website template built on the Mond Design System with admin
+              capabilities for content management and brand customization.
+            </Text>
+          </Box>
 
-        <Box display="flex" gap={5} marginTop={10}>
-          <Button>Get Started</Button>
-          <Button>Learn More</Button>
+          <Box display="flex" gap="md">
+            <Button variant="primary">Get Started</Button>
+            <Button variant="outline">Learn More</Button>
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </>
   );
 }

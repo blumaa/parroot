@@ -2,6 +2,9 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 
+// Mock server-only package to prevent errors in tests
+vi.mock('server-only', () => ({}));
+
 // Mock environment variables
 process.env.NEXT_PUBLIC_FIREBASE_API_KEY = 'test-api-key';
 process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = 'test.firebaseapp.com';
@@ -90,6 +93,32 @@ vi.mock('./app/utils/firebase', () => {
     getFirebaseStorage: vi.fn(() => mockStorage),
   };
 });
+
+// Mock server-only modules
+vi.mock('./app/lib/session', () => ({
+  encrypt: vi.fn(),
+  decrypt: vi.fn(),
+  createSession: vi.fn(),
+  deleteSession: vi.fn(),
+  getSession: vi.fn(),
+}));
+
+vi.mock('./app/lib/dal', () => ({
+  verifySession: vi.fn(),
+  getUser: vi.fn(),
+  requireAdmin: vi.fn(),
+}));
+
+vi.mock('./app/lib/firebase-admin', () => ({
+  getFirebaseAdmin: vi.fn(),
+  getAdminAuth: vi.fn(),
+  getAdminDb: vi.fn(),
+}));
+
+vi.mock('./app/actions/auth', () => ({
+  createSessionFromCredentials: vi.fn(() => Promise.resolve({ success: true })),
+  logout: vi.fn(),
+}));
 
 // Cleanup after each test
 afterEach(() => {

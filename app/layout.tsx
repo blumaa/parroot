@@ -1,8 +1,5 @@
-"use client";
-
 import "./globals.css";
-import { AppThemeProvider } from "./providers/AppThemeProvider";
-import { AuthProvider } from "./providers/AuthProvider";
+import { ToastProvider } from "./providers/ToastProvider";
 
 export default function RootLayout({
   children,
@@ -10,13 +7,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light">
       <body>
-        <AppThemeProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </AppThemeProvider>
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

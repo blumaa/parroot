@@ -1,3 +1,5 @@
+@import "@mond-design-system/theme/theme.css";
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -6,11 +8,103 @@
 
 html,
 body {
+  height: 100%;
   max-width: 100vw;
   overflow-x: hidden;
+  background: var(--mond-surface-background);
+  color: var(--mond-text-primary);
+  font-family: var(--mond-font-family-sans);
 }
 
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility classes for layout */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.max-w-3xl {
+  max-width: 48rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+.bg-white {
+  /* background-color: var(--mond-surface-primary); */
+  background-color: var(--mond-surface-base);
+}
+
+.bg-gray-50 {
+  background-color: var(--mond-surface-base);
+}
+
+.border-b {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+
+.border-r {
+  border-right-width: 1px;
+  border-right-style: solid;
+}
+
+.border-gray-200 {
+  border-color: var(--mond-border-default);
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.max-w-md {
+  max-width: 28rem;
+}
+
+.w-64 {
+  width: 16rem;
+}
+
+.no-underline {
+  text-decoration: none;
 }

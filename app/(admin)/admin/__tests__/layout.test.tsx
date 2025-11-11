@@ -1,0 +1,94 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render } from '@testing-library/react';
+import React from 'react';
+import AdminLayout from '../layout';
+
+// Mock MDS components
+vi.mock('@mond-design-system/theme', () => ({
+  Box: ({ children, ...props }: React.ComponentProps<'div'>) => <div data-testid="mds-box" {...props}>{children}</div>,
+}));
+
+// Mock admin components
+vi.mock('@/app/components/admin/AdminHeader', () => ({
+  AdminHeader: ({ user }: { user: { email: string } }) => <div data-testid="admin-header">{user.email}</div>,
+}));
+
+vi.mock('@/app/components/admin/AdminNavigation', () => ({
+  AdminNavigation: () => <nav data-testid="admin-navigation">Navigation</nav>,
+}));
+
+// Mock getUser
+vi.mock('@/app/lib/dal', () => ({
+  getUser: vi.fn(),
+}));
+
+// Mock Next.js redirect
+const mockRedirect = vi.fn();
+vi.mock('next/navigation', () => ({
+  redirect: (url: string) => mockRedirect(url),
+}));
+
+describe('AdminLayout', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('renders admin layout when user is authenticated', async () => {
+    const { getUser } = await import('@/app/lib/dal');
+    vi.mocked(getUser).mockResolvedValue({
+      id: '123',
+      email: 'test@example.com',
+      role: 'admin',
+    });
+
+    const layout = await AdminLayout({ children: <div>Test Content</div> });
+    const { getByText, getByTestId } = render(layout as React.ReactElement);
+
+    expect(getByTestId('admin-navigation')).toBeInTheDocument();
+    expect(getByTestId('admin-header')).toBeInTheDocument();
+    expect(getByText('Test Content')).toBeInTheDocument();
+  });
+
+  it('redirects to login when user is not authenticated', async () => {
+    const { getUser } = await import('@/app/lib/dal');
+    vi.mocked(getUser).mockResolvedValue(null);
+
+    try {
+      await AdminLayout({ children: <div>Test Content</div> });
+    } catch {
+      // redirect throws an error in Next.js
+    }
+
+    expect(mockRedirect).toHaveBeenCalledWith('/login');
+  });
+
+  it('passes user data to AdminHeader', async () => {
+    const { getUser } = await import('@/app/lib/dal');
+    const mockUser = {
+      id: '456',
+      email: 'admin@example.com',
+      role: 'admin' as const,
+    };
+    vi.mocked(getUser).mockResolvedValue(mockUser);
+
+    const layout = await AdminLayout({ children: <div>Test</div> });
+    const { getByText } = render(layout as React.ReactElement);
+
+    expect(getByText('admin@example.com')).toBeInTheDocument();
+  });
+
+  it('renders children in main content area', async () => {
+    const { getUser } = await import('@/app/lib/dal');
+    vi.mocked(getUser).mockResolvedValue({
+      id: '789',
+      email: 'user@example.com',
+      role: 'admin',
+    });
+
+    const testContent = <div data-testid="test-content">Custom Content</div>;
+    const layout = await AdminLayout({ children: testContent });
+    const { getByTestId } = render(layout as React.ReactElement);
+
+    expect(getByTestId('test-content')).toBeInTheDocument();
+  });
+});

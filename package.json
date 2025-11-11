@@ -13,11 +13,14 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "@mond-design-system/theme": "1.26.0",
+    "@mond-design-system/theme": "2.2.1",
     "firebase": "^12.5.0",
+    "firebase-admin": "^13.6.0",
+    "jose": "^6.1.0",
     "next": "16.0.1",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",

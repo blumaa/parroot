@@ -1,7 +1,7 @@
-import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
-import { getStorage, FirebaseStorage } from 'firebase/storage';
+import type { FirebaseApp } from 'firebase/app';
+import type { Auth } from 'firebase/auth';
+import type { Firestore } from 'firebase/firestore';
+import type { FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -18,11 +18,12 @@ let auth: Auth | undefined;
 let db: Firestore | undefined;
 let storage: FirebaseStorage | undefined;
 
-function initializeFirebase(): void {
+async function initializeFirebase(): Promise<void> {
   if (!app) {
-    if (typeof window === 'undefined') {
-      throw new Error('Firebase can only be initialized in the browser');
-    }
+    const { initializeApp } = await import('firebase/app');
+    const { getAuth } = await import('firebase/auth');
+    const { getFirestore } = await import('firebase/firestore');
+    const { getStorage } = await import('firebase/storage');
 
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
@@ -31,22 +32,30 @@ function initializeFirebase(): void {
   }
 }
 
-export function getFirebaseApp(): FirebaseApp {
-  initializeFirebase();
-  return app!;
+async function getFirebaseService<T>(
+  serviceName: string,
+  serviceGetter: () => T | undefined
+): Promise<T> {
+  await initializeFirebase();
+  const service = serviceGetter();
+  if (!service) {
+    throw new Error(`Firebase ${serviceName} is not initialized`);
+  }
+  return service;
 }
 
-export function getFirebaseAuth(): Auth {
-  initializeFirebase();
-  return auth!;
+export async function getFirebaseApp(): Promise<FirebaseApp> {
+  return getFirebaseService('App', () => app);
 }
 
-export function getFirebaseDb(): Firestore {
-  initializeFirebase();
-  return db!;
+export async function getFirebaseAuth(): Promise<Auth> {
+  return getFirebaseService('Auth', () => auth);
 }
 
-export function getFirebaseStorage(): FirebaseStorage {
-  initializeFirebase();
-  return storage!;
+export async function getFirebaseDb(): Promise<Firestore> {
+  return getFirebaseService('Firestore', () => db);
+}
+
+export async function getFirebaseStorage(): Promise<FirebaseStorage> {
+  return getFirebaseService('Storage', () => storage);
 }
