@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Box, Button, Text, Heading, Badge } from '@mond-design-system/theme';
-import { Input } from '@mond-design-system/theme/client';
+import { Input, Modal, ModalBody, ModalFooter } from '@mond-design-system/theme/client';
 import { getSegments, deleteSegment, type Segment, type SegmentType } from '@/app/utils/firestore-segments';
 import { useToast } from '@/app/providers/ToastProvider';
 
@@ -234,32 +234,13 @@ export function SegmentList({ onDelete }: SegmentListProps) {
                           Edit
                         </Button>
                       </Link>
-                      {deleteConfirm === segment.id ? (
-                        <Box display="flex" gap="sm">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDelete(segment.id)}
-                          >
-                            Confirm
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setDeleteConfirm(null)}
-                          >
-                            Cancel
-                          </Button>
-                        </Box>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setDeleteConfirm(segment.id)}
-                        >
-                          Delete
-                        </Button>
-                      )}
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setDeleteConfirm(segment.id)}
+                      >
+                        Delete
+                      </Button>
                     </Box>
                   </td>
                 </tr>
@@ -268,6 +249,31 @@ export function SegmentList({ onDelete }: SegmentListProps) {
           </table>
         </Box>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteConfirm !== null}
+        onClose={() => setDeleteConfirm(null)}
+        title="Delete Segment"
+        size="sm"
+      >
+        <ModalBody>
+          <Text>Are you sure you want to delete this segment? This action cannot be undone.</Text>
+        </ModalBody>
+        <ModalFooter>
+          <Box display="flex" gap="sm" justifyContent="flex-end">
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteConfirm && handleDelete(deleteConfirm)}
+            >
+              Delete
+            </Button>
+          </Box>
+        </ModalFooter>
+      </Modal>
     </Box>
   );
 }

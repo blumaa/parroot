@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Box, Button, Text, Heading, Badge } from '@mond-design-system/theme';
-import { Input } from '@mond-design-system/theme/client';
+import { Input, Modal, ModalBody, ModalFooter } from '@mond-design-system/theme/client';
 import { getPages, deletePage, type Page } from '@/app/utils/firestore-pages';
 import { useToast } from '@/app/providers/ToastProvider';
 
@@ -192,32 +192,13 @@ export function PageList({ onDelete }: PageListProps) {
                           Edit
                         </Button>
                       </Link>
-                      {deleteConfirm === page.id ? (
-                        <Box display="flex" gap="sm">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDelete(page.id)}
-                          >
-                            Confirm
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setDeleteConfirm(null)}
-                          >
-                            Cancel
-                          </Button>
-                        </Box>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setDeleteConfirm(page.id)}
-                        >
-                          Delete
-                        </Button>
-                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setDeleteConfirm(page.id)}
+                      >
+                        Delete
+                      </Button>
                     </Box>
                   </td>
                 </tr>
@@ -226,6 +207,31 @@ export function PageList({ onDelete }: PageListProps) {
           </table>
         </Box>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteConfirm !== null}
+        onClose={() => setDeleteConfirm(null)}
+        title="Delete Page"
+        size="sm"
+      >
+        <ModalBody>
+          <Text>Are you sure you want to delete this page? This action cannot be undone.</Text>
+        </ModalBody>
+        <ModalFooter>
+          <Box display="flex" gap="sm" justifyContent="flex-end">
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteConfirm && handleDelete(deleteConfirm)}
+            >
+              Delete
+            </Button>
+          </Box>
+        </ModalFooter>
+      </Modal>
     </Box>
   );
 }

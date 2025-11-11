@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Box, Button, Heading, Text } from '@mond-design-system/theme';
-import { Select } from '@mond-design-system/theme/client';
+import { Select, Modal, ModalBody, ModalFooter } from '@mond-design-system/theme/client';
 import {
   getMenuItems,
   createMenuItem,
@@ -289,35 +289,14 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
                   </Box>
 
                   {/* Delete */}
-                  {deleteConfirm === item.id ? (
-                    <Box display="flex" gap="sm">
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleRemove(item.id)}
-                      >
-                        Confirm
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setDeleteConfirm(null)}
-                      >
-                        Cancel
-                      </Button>
-                    </Box>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setDeleteConfirm(item.id)}
-                    >
-                      Remove
-                    </Button>
-                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setDeleteConfirm(item.id)}
+                  >
+                    Remove
+                  </Button>
                 </Box>
               );
             })}
@@ -365,6 +344,31 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
           </Box>
         )}
       </Box>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteConfirm !== null}
+        onClose={() => setDeleteConfirm(null)}
+        title="Remove Menu Item"
+        size="sm"
+      >
+        <ModalBody>
+          <Text>Are you sure you want to remove this item from the navigation menu?</Text>
+        </ModalBody>
+        <ModalFooter>
+          <Box display="flex" gap="sm" justifyContent="flex-end">
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteConfirm && handleRemove(deleteConfirm)}
+            >
+              Remove
+            </Button>
+          </Box>
+        </ModalFooter>
+      </Modal>
     </Box>
   );
 }

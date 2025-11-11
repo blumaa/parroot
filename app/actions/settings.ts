@@ -17,7 +17,7 @@ export async function updateSettings(formData: FormData) {
   const googleAnalyticsId = formData.get('googleAnalyticsId') as string;
 
   try {
-    const settingsData: Record<string, any> = {
+    const settingsData: Record<string, string> = {
       siteName,
       siteDescription,
       contactEmail,

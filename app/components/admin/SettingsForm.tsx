@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Button, Heading, Text } from '@mond-design-system/theme';
+import { Box, Button, Heading } from '@mond-design-system/theme';
 import { Input, Select } from '@mond-design-system/theme/client';
 import type { SiteSettings } from '@/app/utils/firestore-settings';
 import { updateSettings } from '@/app/actions/settings';

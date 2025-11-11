@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Button, Heading, Text } from '@mond-design-system/theme';
+import { Box, Button, Heading, Text, Divider } from '@mond-design-system/theme';
 import { Input, Radio, Textarea } from '@mond-design-system/theme/client';
 import {
   createSegment,
@@ -12,6 +12,7 @@ import {
   type SegmentType,
 } from '@/app/utils/firestore-segments';
 import { useToast } from '@/app/providers/ToastProvider';
+import { TextBlockSegmentForm } from './segment-forms/TextBlockSegmentForm';
 
 const SEGMENT_TYPES: { value: SegmentType; label: string; description: string }[] = [
   { value: 'carousel', label: 'Carousel', description: 'Rotating image or content slider' },
@@ -112,6 +113,7 @@ export function SegmentForm({ segment, userId }: SegmentFormProps) {
               {SEGMENT_TYPES.map((segmentType) => (
                 <Box key={segmentType.value} className="flex items-start gap-2">
                   <Radio
+                    id={`segment-type-${segmentType.value}`}
                     name="segmentType"
                     value={segmentType.value}
                     checked={type === segmentType.value}
@@ -149,41 +151,14 @@ export function SegmentForm({ segment, userId }: SegmentFormProps) {
           </Box>
         </Box>
 
+        <Divider variant='strong' />
+
         {/* Dynamic Content Fields Based on Type */}
-        <Box className="flex flex-col gap-4">
+        <Box display="flex" flexDirection="column" gap="md">
           <Heading level={3}>Content</Heading>
 
           {type === 'text-block' && (
-            <>
-              <Input
-                label="Title"
-                type="text"
-                placeholder="Enter title"
-                value={(content.title as string) || ''}
-                onChange={(e) => setContent({ ...content, title: e.target.value })}
-              />
-              <Textarea
-                label="Body"
-                placeholder="Enter body text"
-                value={(content.body as string) || ''}
-                onChange={(e) => setContent({ ...content, body: e.target.value })}
-                rows={6}
-              />
-              <Input
-                label="Button Text (optional)"
-                type="text"
-                placeholder="e.g., Learn More"
-                value={(content.buttonText as string) || ''}
-                onChange={(e) => setContent({ ...content, buttonText: e.target.value })}
-              />
-              <Input
-                label="Button URL (optional)"
-                type="text"
-                placeholder="e.g., /about"
-                value={(content.buttonUrl as string) || ''}
-                onChange={(e) => setContent({ ...content, buttonUrl: e.target.value })}
-              />
-            </>
+            <TextBlockSegmentForm content={content} onContentChange={setContent} />
           )}
 
           {type === 'cta' && (

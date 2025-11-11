@@ -2,6 +2,7 @@
 
 import { Box, Text } from '@mond-design-system/theme';
 import type { Segment } from '@/app/utils/firestore-segments';
+import { TextBlockSegmentRenderer } from './TextBlockSegmentRenderer';
 
 interface SegmentRendererProps {
   segment: Segment;
@@ -17,8 +18,6 @@ interface SegmentRendererProps {
  */
 export function SegmentRenderer({ segment, locale = 'en' }: SegmentRendererProps) {
   // Get localized content if available
-  // This will be used when segment types are implemented
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const content = segment.content?.[locale] || segment.content?.en || {};
 
   switch (segment.type) {
@@ -31,8 +30,7 @@ export function SegmentRenderer({ segment, locale = 'en' }: SegmentRendererProps
       return <PlaceholderSegment type="Gallery" segmentName={segment.name} />;
 
     case 'text-block':
-      // TODO: Import and render TextBlockSegment (MDS-18)
-      return <PlaceholderSegment type="Text Block" segmentName={segment.name} />;
+      return <TextBlockSegmentRenderer content={content} />;
 
     case 'hero':
       // TODO: Import and render HeroSegment (MDS-19)
