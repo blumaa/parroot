@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Box, Button } from '@mond-design-system/theme';
 import { logout } from '@/app/actions/auth';
@@ -11,6 +12,8 @@ interface HeaderAuthButtonsProps {
 
 export function HeaderAuthButtons({ user }: HeaderAuthButtonsProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const pathname = usePathname();
+  const isAdminArea = pathname?.startsWith('/admin');
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -25,9 +28,9 @@ export function HeaderAuthButtons({ user }: HeaderAuthButtonsProps) {
   if (user) {
     return (
       <Box display="flex" alignItems="center" gap="sm">
-        <Link href="/admin" className="no-underline">
+        <Link href={isAdminArea ? '/' : '/admin'} className="no-underline">
           <Button variant="outline" size="sm">
-            Admin
+            {isAdminArea ? 'Home' : 'Admin'}
           </Button>
         </Link>
         <Button
