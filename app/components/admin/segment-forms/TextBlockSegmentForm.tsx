@@ -278,9 +278,8 @@ export function TextBlockSegmentForm({
       {/* Live Preview */}
       <Box>
         <Heading level={3}>Live Preview</Heading>
-        <Divider />
         
-        <Box marginTop="2">
+        <Box marginTop="2" border="default" >
           <TextBlockSegmentRenderer content={content} />
         </Box>
       </Box>

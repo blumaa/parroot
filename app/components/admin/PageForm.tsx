@@ -138,8 +138,8 @@ export function PageForm({ page, userId }: PageFormProps) {
             <Button type="button" variant="outline" onClick={() => router.back()}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={loading || !!slugError}>
-              {loading ? 'Saving...' : page ? 'Update Page' : 'Create Page'}
+            <Button type="submit" variant="primary" loading={loading} disabled={!!slugError}>
+              {page ? 'Update Page' : 'Create Page'}
             </Button>
           </Box>
         </Box>

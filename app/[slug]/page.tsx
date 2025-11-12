@@ -1,6 +1,6 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { notFound } from 'next/navigation';
-import { Box } from '@mond-design-system/theme';
+import { Box, Divider } from '@mond-design-system/theme';
 import { Header } from '@/app/components/Header';
 import { SegmentRenderer } from '@/app/components/segments/SegmentRenderer';
 import { getPageBySlug } from '@/app/utils/firestore-pages';
@@ -54,6 +54,7 @@ export default async function DynamicPage({ params }: PageProps) {
         user={user}
         siteName={settings?.siteName}
         logoUrl={settings?.logoUrl}
+        stickyHeader={settings?.stickyHeader}
       />
       <Box as="main" className="min-h-screen">
         {publishedSegments.length === 0 ? (
@@ -63,8 +64,13 @@ export default async function DynamicPage({ params }: PageProps) {
             </Box>
           </Box>
         ) : (
-          publishedSegments.map((segment) => (
-            <SegmentRenderer key={segment.id} segment={segment} />
+          publishedSegments.map((segment, index) => (
+            <Box key={segment.id}>
+              <SegmentRenderer segment={segment} />
+              {index < publishedSegments.length - 1 && (
+                <Divider />
+              )}
+            </Box>
           ))
         )}
       </Box>

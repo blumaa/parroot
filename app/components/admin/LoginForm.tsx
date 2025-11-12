@@ -62,8 +62,8 @@ export function LoginForm() {
         required
         disabled={isLoading}
       />
-      <Button type="submit" variant="primary" disabled={isLoading}>
-        {isLoading ? 'Logging in...' : 'Login'}
+      <Button type="submit" variant="primary" loading={isLoading}>
+        Login
       </Button>
     </form>
   );

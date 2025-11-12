@@ -3,6 +3,7 @@
 import { Box, Text } from '@mond-design-system/theme';
 import type { Segment } from '@/app/utils/firestore-segments';
 import { TextBlockSegmentRenderer } from './TextBlockSegmentRenderer';
+import { CarouselSegmentRenderer } from './CarouselSegmentRenderer';
 
 interface SegmentRendererProps {
   segment: Segment;
@@ -22,8 +23,11 @@ export function SegmentRenderer({ segment, locale = 'en' }: SegmentRendererProps
 
   switch (segment.type) {
     case 'carousel':
-      // TODO: Import and render CarouselSegment (MDS-16)
-      return <PlaceholderSegment type="Carousel" segmentName={segment.name} />;
+      return (
+        <Box display="flex" justifyContent="center" alignItems="center">
+          <CarouselSegmentRenderer content={content} />
+        </Box>
+      );
 
     case 'gallery':
       // TODO: Import and render GallerySegment (MDS-17)

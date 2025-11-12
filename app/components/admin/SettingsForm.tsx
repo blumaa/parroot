@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Button, Heading } from '@mond-design-system/theme';
-import { Input, Select } from '@mond-design-system/theme/client';
+import { Box, Button, Heading, Text } from '@mond-design-system/theme';
+import { Input, Select, Switch } from '@mond-design-system/theme/client';
 import type { SiteSettings } from '@/app/utils/firestore-settings';
 import { updateSettings } from '@/app/actions/settings';
 import { useToast } from '@/app/providers/ToastProvider';
@@ -15,6 +15,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
   const { showSuccess, showError } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [paypalMode, setPaypalMode] = useState<'sandbox' | 'production'>(settings.paypalMode || 'sandbox');
+  const [stickyHeader, setStickyHeader] = useState(settings.stickyHeader ?? false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -97,6 +98,25 @@ export function SettingsForm({ settings }: SettingsFormProps) {
               helperText="URL to your site favicon"
             />
           </Box>
+
+          <Box display="flex" flexDirection="column" gap="sm">
+            <Box display="flex" alignItems="center" gap="sm">
+              <Switch
+                id="stickyHeader"
+                checked={stickyHeader}
+                onChange={(e) => setStickyHeader(e.target.checked)}
+              />
+              <label htmlFor="stickyHeader">
+                <Text variant="body">
+                  Sticky Header
+                </Text>
+              </label>
+            </Box>
+            <Text variant="body-sm" semantic="secondary">
+              Keep the header fixed at the top when scrolling
+            </Text>
+            <input type="hidden" name="stickyHeader" value={stickyHeader.toString()} />
+          </Box>
         </Box>
       </Box>
 
@@ -151,8 +171,8 @@ export function SettingsForm({ settings }: SettingsFormProps) {
 
       {/* Save Button */}
       <Box display="flex" gap="md">
-        <Button type="submit" variant="primary" disabled={isSaving}>
-          {isSaving ? 'Saving...' : 'Save Settings'}
+        <Button type="submit" variant="primary" loading={isSaving}>
+          Save Settings
         </Button>
       </Box>
     </form>

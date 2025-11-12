@@ -73,6 +73,15 @@ export interface Segment {
 }
 
 // Specific segment prop types
+export interface CarouselSlide {
+  id: string;
+  imageUrl: string;
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonUrl: string;
+}
+
 export interface CarouselProps {
   items: Array<{
     id: string;

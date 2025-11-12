@@ -13,9 +13,10 @@ interface HeaderProps {
   user: { id: string; email: string } | null;
   siteName?: string;
   logoUrl?: string;
+  stickyHeader?: boolean;
 }
 
-export function Header({ menuItems, pages, user, siteName = 'Parroot', logoUrl }: HeaderProps) {
+export function Header({ menuItems, pages, user, siteName = 'Parroot', logoUrl, stickyHeader = false }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Create a map of pageId to page for quick lookup
@@ -31,7 +32,7 @@ export function Header({ menuItems, pages, user, siteName = 'Parroot', logoUrl }
     .filter((item) => item.page); // Only show items with valid pages
 
   return (
-    <Box as="header" className="border-b border-gray-200 bg-white" padding='4'>
+    <Box as="header" className={`border-b border-gray-200 bg-white${stickyHeader ? ' sticky-header' : ''}`} padding='4' marginBottom='2'>
       <Box className="container mx-auto px-4">
         <Box display="flex" alignItems="center" justifyContent="space-between" className="h-16">
           {/* Logo/Site Title */}

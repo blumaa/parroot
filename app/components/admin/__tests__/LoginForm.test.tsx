@@ -131,7 +131,7 @@ describe('LoginForm', () => {
     });
   });
 
-  it('disables submit button during loading', async () => {
+  it('shows loading state during login', async () => {
     const { signInUser } = await import('@/app/utils/auth');
     let resolveSignIn: ((value: never) => void) | undefined;
     const signInPromise = new Promise<never>((resolve) => {
@@ -150,12 +150,15 @@ describe('LoginForm', () => {
     await user.type(passwordInput, 'password123');
     await user.click(submitButton);
 
-    expect(submitButton).toBeDisabled();
+    // Inputs should be disabled during loading
+    expect(emailInput).toBeDisabled();
+    expect(passwordInput).toBeDisabled();
 
     resolveSignIn?.({ user: { uid: '123', email: 'test@example.com' } } as never);
 
     await waitFor(() => {
-      expect(submitButton).not.toBeDisabled();
+      expect(emailInput).not.toBeDisabled();
+      expect(passwordInput).not.toBeDisabled();
     });
   });
 

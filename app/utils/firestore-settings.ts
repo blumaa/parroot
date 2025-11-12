@@ -8,6 +8,9 @@ export interface SiteSettings {
   siteDescription: string;
   contactEmail: string;
 
+  // Header Settings
+  stickyHeader?: boolean;
+
   // PayPal Integration
   paypalClientId?: string;
   paypalMode?: 'sandbox' | 'production';
@@ -45,6 +48,7 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
       siteName: data?.siteName || '',
       siteDescription: data?.siteDescription || '',
       contactEmail: data?.contactEmail || '',
+      stickyHeader: data?.stickyHeader ?? false,
       paypalClientId: data?.paypalClientId,
       paypalMode: data?.paypalMode || 'sandbox',
       googleAnalyticsId: data?.googleAnalyticsId,

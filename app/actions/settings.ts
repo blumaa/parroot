@@ -12,15 +12,17 @@ export async function updateSettings(formData: FormData) {
   const contactEmail = formData.get('contactEmail') as string;
   const logoUrl = formData.get('logoUrl') as string;
   const faviconUrl = formData.get('faviconUrl') as string;
+  const stickyHeader = formData.get('stickyHeader') === 'true';
   const paypalClientId = formData.get('paypalClientId') as string;
   const paypalMode = formData.get('paypalMode') as 'sandbox' | 'production';
   const googleAnalyticsId = formData.get('googleAnalyticsId') as string;
 
   try {
-    const settingsData: Record<string, string> = {
+    const settingsData: Record<string, string | boolean> = {
       siteName,
       siteDescription,
       contactEmail,
+      stickyHeader,
       paypalMode: paypalMode || 'sandbox',
     };
 
