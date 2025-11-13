@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Button, Heading, Text, Divider } from "@mond-design-system/theme";
-import { Input, Radio, Textarea } from "@mond-design-system/theme/client";
+import { Input, Textarea } from "@mond-design-system/theme/client";
 import {
   createSegment,
   updateSegment,
@@ -14,6 +14,7 @@ import {
 import { useToast } from "@/app/providers/ToastProvider";
 import { TextBlockSegmentForm } from "./segment-forms/TextBlockSegmentForm";
 import { CarouselSegmentForm } from "./segment-forms/CarouselSegmentForm";
+import { GallerySegmentForm } from "./segment-forms/GallerySegmentForm";
 
 const SEGMENT_TYPES: {
   value: SegmentType;
@@ -64,6 +65,8 @@ export function SegmentForm({
 
   // Form state
   const [name, setName] = useState(segment?.name || "");
+  // Type is set once and not changed (type selection happens on /admin/segments/new page)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [type, setType] = useState<SegmentType>(
     segment?.type || initialType || "carousel",
   );
@@ -278,12 +281,10 @@ export function SegmentForm({
           )}
 
           {type === "gallery" && (
-            <Box display="flex" flexDirection="column" gap="md">
-              <Text variant="body-sm" semantic="secondary">
-                Gallery configuration coming soon. For now, create the segment
-                and configure images later.
-              </Text>
-            </Box>
+            <GallerySegmentForm
+              content={content}
+              onContentChange={setContent}
+            />
           )}
         </Box>
       </Box>

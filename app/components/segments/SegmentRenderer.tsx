@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { Box, Text } from '@mond-design-system/theme';
-import type { Segment } from '@/app/utils/firestore-segments';
-import { TextBlockSegmentRenderer } from './TextBlockSegmentRenderer';
-import { CarouselSegmentRenderer } from './CarouselSegmentRenderer';
+import { Box, Text } from "@mond-design-system/theme";
+import type { Segment } from "@/app/utils/firestore-segments";
+import { TextBlockSegmentRenderer } from "./TextBlockSegmentRenderer";
+import { CarouselSegmentRenderer } from "./CarouselSegmentRenderer";
+import { GallerySegmentRenderer } from "./GallerySegmentRenderer";
 
 interface SegmentRendererProps {
   segment: Segment;
@@ -17,48 +18,58 @@ interface SegmentRendererProps {
  * As we implement specific segment types (MDS-16 through MDS-24),
  * we'll import their components and add them to the switch statement.
  */
-export function SegmentRenderer({ segment, locale = 'en' }: SegmentRendererProps) {
+export function SegmentRenderer({
+  segment,
+  locale = "en",
+}: SegmentRendererProps) {
   // Get localized content if available
   const content = segment.content?.[locale] || segment.content?.en || {};
 
   switch (segment.type) {
-    case 'carousel':
+    case "carousel":
       return (
         <Box display="flex" justifyContent="center" alignItems="center">
           <CarouselSegmentRenderer content={content} />
         </Box>
       );
 
-    case 'gallery':
-      // TODO: Import and render GallerySegment (MDS-17)
-      return <PlaceholderSegment type="Gallery" segmentName={segment.name} />;
+    case "gallery":
+      return (
+        <Box display="flex" justifyContent="center" alignItems="center">
+          <GallerySegmentRenderer content={content} />;
+        </Box>
+      );
 
-    case 'text-block':
+    case "text-block":
       return <TextBlockSegmentRenderer content={content} />;
 
-    case 'hero':
+    case "hero":
       // TODO: Import and render HeroSegment (MDS-19)
       return <PlaceholderSegment type="Hero" segmentName={segment.name} />;
 
-    case 'cta':
+    case "cta":
       // TODO: Import and render CTASegment (MDS-20)
       return <PlaceholderSegment type="CTA" segmentName={segment.name} />;
 
-    case 'testimonials':
+    case "testimonials":
       // TODO: Import and render TestimonialsSegment (MDS-21)
-      return <PlaceholderSegment type="Testimonials" segmentName={segment.name} />;
+      return (
+        <PlaceholderSegment type="Testimonials" segmentName={segment.name} />
+      );
 
-    case 'faq':
+    case "faq":
       // TODO: Import and render FAQSegment (MDS-22)
       return <PlaceholderSegment type="FAQ" segmentName={segment.name} />;
 
-    case 'team':
+    case "team":
       // TODO: Import and render TeamSegment (MDS-23)
       return <PlaceholderSegment type="Team" segmentName={segment.name} />;
 
-    case 'contact-form':
+    case "contact-form":
       // TODO: Import and render ContactFormSegment (MDS-24)
-      return <PlaceholderSegment type="Contact Form" segmentName={segment.name} />;
+      return (
+        <PlaceholderSegment type="Contact Form" segmentName={segment.name} />
+      );
 
     default:
       return (
@@ -72,9 +83,18 @@ export function SegmentRenderer({ segment, locale = 'en' }: SegmentRendererProps
 /**
  * Placeholder component for segments not yet implemented
  */
-function PlaceholderSegment({ type, segmentName }: { type: string; segmentName: string }) {
+function PlaceholderSegment({
+  type,
+  segmentName,
+}: {
+  type: string;
+  segmentName: string;
+}) {
   return (
-    <Box padding="4" className="border-2 border-dashed border-gray-300 bg-gray-50">
+    <Box
+      padding="4"
+      className="border-2 border-dashed border-gray-300 bg-gray-50"
+    >
       <Text variant="body" semantic="secondary">
         {type} Segment: {segmentName}
       </Text>

@@ -65,7 +65,7 @@ export default async function DynamicPage({ params }: PageProps) {
           </Box>
         ) : (
           publishedSegments.map((segment, index) => (
-            <Box key={segment.id}>
+            <Box key={segment.id} paddingLeft='4' paddingRight='4'>
               <SegmentRenderer segment={segment} />
               {index < publishedSegments.length - 1 && (
                 <Divider />

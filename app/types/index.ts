@@ -82,6 +82,13 @@ export interface CarouselSlide {
   buttonUrl: string;
 }
 
+export interface GalleryImage {
+  id: string;
+  imageUrl: string;
+  caption: string;
+  alt: string;
+}
+
 export interface CarouselProps {
   items: Array<{
     id: string;

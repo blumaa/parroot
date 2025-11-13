@@ -1,0 +1,111 @@
+.gallery-grid {
+  display: grid;
+  gap: var(--mond-spacing-4);
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Mobile: 1-2 columns max */
+.gallery-grid[data-images-per-row="1"] {
+  grid-template-columns: 1fr;
+}
+
+.gallery-grid[data-images-per-row="2"],
+.gallery-grid[data-images-per-row="3"],
+.gallery-grid[data-images-per-row="4"],
+.gallery-grid[data-images-per-row="5"] {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Medium screens: 2-3 columns max */
+@media (min-width: 768px) {
+  .gallery-grid[data-images-per-row="1"] {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-grid[data-images-per-row="2"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gallery-grid[data-images-per-row="3"],
+  .gallery-grid[data-images-per-row="4"],
+  .gallery-grid[data-images-per-row="5"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Large screens: use actual column count */
+@media (min-width: 1024px) {
+  .gallery-grid[data-images-per-row="1"] {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-grid[data-images-per-row="2"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gallery-grid[data-images-per-row="3"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .gallery-grid[data-images-per-row="4"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .gallery-grid[data-images-per-row="5"] {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Row constraints */
+.gallery-grid[data-row-count="1"] {
+  grid-template-rows: auto;
+}
+
+.gallery-grid[data-row-count="2"] {
+  grid-template-rows: repeat(2, auto);
+}
+
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--mond-spacing-4);
+}
+
+.lightbox-button {
+  position: absolute;
+}
+
+.lightbox-button.close {
+  top: var(--mond-spacing-4);
+  right: var(--mond-spacing-4);
+}
+
+.lightbox-button.prev {
+  left: var(--mond-spacing-4);
+}
+
+.lightbox-button.next {
+  right: var(--mond-spacing-4);
+}
+
+.lightbox-button button {
+  font-size: 2rem;
+  color: white;
+}
+
+.lightbox-image-container {
+  max-width: 90vw;
+  max-height: 90vh;
+  position: relative;
+}
+
+.caption-white {
+  color: white;
+}
