@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Text } from '@mond-design-system/theme';
+import { Box, Text, Spinner } from '@mond-design-system/theme';
 import { SegmentForm } from './SegmentForm';
 import { getSegmentById, type Segment } from '@/app/utils/firestore-segments';
 
@@ -40,8 +40,8 @@ export function EditSegmentWrapper({ segmentId, userId }: EditSegmentWrapperProp
 
   if (loading) {
     return (
-      <Box padding="4">
-        <Text>Loading segment...</Text>
+      <Box padding="8" display="flex" justifyContent="center">
+        <Spinner size="lg" label="Loading segment..." />
       </Box>
     );
   }

@@ -82,13 +82,13 @@ describe('NewSegmentPage (Segment Type Selection)', () => {
     expect(mockPush).toHaveBeenCalledWith('/admin/segments/new/cta');
   });
 
-  it('navigates to contact-form creation when contact form button clicked', async () => {
+  it('navigates to form creation when form button clicked', async () => {
     const user = userEvent.setup();
     render(<NewSegmentPage />);
 
     const buttons = screen.getAllByRole('button', { name: /create/i });
-    await user.click(buttons[4]); // Fifth button is Contact Form
+    await user.click(buttons[4]); // Fifth button is Form
 
-    expect(mockPush).toHaveBeenCalledWith('/admin/segments/new/contact-form');
+    expect(mockPush).toHaveBeenCalledWith('/admin/segments/new/form');
   });
 });

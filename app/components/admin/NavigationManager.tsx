@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Box, Button, Heading, Text } from '@mond-design-system/theme';
+import { Box, Button, Heading, Text, Spinner } from '@mond-design-system/theme';
 import { Select, Modal, ModalBody, ModalFooter } from '@mond-design-system/theme/client';
 import {
   getMenuItems,
@@ -179,8 +179,8 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
 
   if (loading) {
     return (
-      <Box padding="4">
-        <Text>Loading navigation...</Text>
+      <Box padding="8" display="flex" justifyContent="center">
+        <Spinner size="lg" label="Loading navigation..." />
       </Box>
     );
   }

@@ -17,6 +17,7 @@ export function AdminNavigation({ siteName = 'Parroot' }: AdminNavigationProps) 
     { label: 'Segments', href: '/admin/segments' },
     { label: 'Navigation', href: '/admin/navigation' },
     { label: 'Settings', href: '/admin/settings' },
+    { label: 'Mailbox', href: '/admin/mailbox' },
   ];
 
   return (

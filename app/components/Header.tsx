@@ -59,7 +59,7 @@ export function Header({ menuItems, pages, user, siteName = 'Parroot', logoUrl, 
                   className="no-underline"
                 >
                   <Button variant={item.variant} size={item.size} corners='rounded'>
-                    {item.label}
+                    {item.page!.title}
                   </Button>
                 </Link>
               ))}
@@ -91,7 +91,7 @@ export function Header({ menuItems, pages, user, siteName = 'Parroot', logoUrl, 
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <Button variant={item.variant} size={item.size} fullWidth>
-                    {item.label}
+                    {item.page!.title}
                   </Button>
                 </Link>
               ))}

@@ -69,7 +69,7 @@ service cloud.firestore {
       allow create: if true; // Public can submit forms
       allow update, delete: if isEditor();
     }
-    
+
     // Site Settings - public read, admin only write
     match /siteSettings/{settingId} {
       allow read: if true;

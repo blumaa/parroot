@@ -5,6 +5,8 @@ import type { Segment } from "@/app/utils/firestore-segments";
 import { TextBlockSegmentRenderer } from "./TextBlockSegmentRenderer";
 import { CarouselSegmentRenderer } from "./CarouselSegmentRenderer";
 import { GallerySegmentRenderer } from "./GallerySegmentRenderer";
+import { CTASegmentRenderer } from "./CTASegmentRenderer";
+import { FormSegmentRenderer } from "./FormSegmentRenderer";
 
 interface SegmentRendererProps {
   segment: Segment;
@@ -48,8 +50,7 @@ export function SegmentRenderer({
       return <PlaceholderSegment type="Hero" segmentName={segment.name} />;
 
     case "cta":
-      // TODO: Import and render CTASegment (MDS-20)
-      return <PlaceholderSegment type="CTA" segmentName={segment.name} />;
+      return <CTASegmentRenderer content={content} />;
 
     case "testimonials":
       // TODO: Import and render TestimonialsSegment (MDS-21)
@@ -65,11 +66,8 @@ export function SegmentRenderer({
       // TODO: Import and render TeamSegment (MDS-23)
       return <PlaceholderSegment type="Team" segmentName={segment.name} />;
 
-    case "contact-form":
-      // TODO: Import and render ContactFormSegment (MDS-24)
-      return (
-        <PlaceholderSegment type="Contact Form" segmentName={segment.name} />
-      );
+    case "form":
+      return <FormSegmentRenderer content={content} />;
 
     default:
       return (

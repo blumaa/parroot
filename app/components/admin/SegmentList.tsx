@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Box, Button, Text, Heading, Badge } from '@mond-design-system/theme';
+import { Box, Button, Text, Heading, Badge, Spinner } from '@mond-design-system/theme';
 import { Input, Modal, ModalBody, ModalFooter } from '@mond-design-system/theme/client';
 import { getSegments, deleteSegment, type Segment, type SegmentType } from '@/app/utils/firestore-segments';
 import { useToast } from '@/app/providers/ToastProvider';
@@ -16,7 +16,7 @@ const SEGMENT_TYPE_LABELS: Record<SegmentType, string> = {
   testimonials: 'Testimonials',
   faq: 'FAQ',
   team: 'Team',
-  'contact-form': 'Contact Form',
+  'form': 'Form',
 };
 
 interface SegmentListProps {
@@ -91,8 +91,8 @@ export function SegmentList({ onDelete }: SegmentListProps) {
 
   if (loading) {
     return (
-      <Box padding="4">
-        <Text>Loading segments...</Text>
+      <Box padding="8" display="flex" justifyContent="center">
+        <Spinner size="lg" label="Loading segments..." />
       </Box>
     );
   }

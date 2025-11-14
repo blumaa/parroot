@@ -8,7 +8,7 @@ const VALID_SEGMENT_TYPES: SegmentType[] = [
   'text-block',
   'gallery',
   'cta',
-  'contact-form',
+  'form',
 ];
 
 interface NewSegmentTypePageProps {

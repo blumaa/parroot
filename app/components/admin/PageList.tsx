@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Box, Button, Text, Heading, Badge } from '@mond-design-system/theme';
+import { Box, Button, Text, Heading, Badge, Spinner } from '@mond-design-system/theme';
 import { Input, Modal, ModalBody, ModalFooter } from '@mond-design-system/theme/client';
 import { getPages, deletePage, type Page } from '@/app/utils/firestore-pages';
 import { useToast } from '@/app/providers/ToastProvider';
@@ -76,8 +76,8 @@ export function PageList({ onDelete }: PageListProps) {
 
   if (loading) {
     return (
-      <Box padding="4">
-        <Text>Loading pages...</Text>
+      <Box padding="8" display="flex" justifyContent="center">
+        <Spinner size="lg" label="Loading pages..." />
       </Box>
     );
   }

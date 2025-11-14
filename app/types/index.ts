@@ -89,6 +89,36 @@ export interface GalleryImage {
   alt: string;
 }
 
+export interface CTAContent {
+  heading: string;
+  description: string;
+  primaryButtonText: string;
+  primaryButtonUrl: string;
+  secondaryButtonText?: string;
+  secondaryButtonUrl?: string;
+  backgroundColor?: string;
+  buttonVariant?: 'primary' | 'outline' | 'ghost';
+}
+
+export type FormFieldType = 'text' | 'email' | 'textarea' | 'phone' | 'select';
+
+export interface FormField {
+  id: string;
+  type: FormFieldType;
+  label: string;
+  placeholder: string;
+  required: boolean;
+  options?: string[]; // for select type only
+}
+
+export interface FormContent {
+  title?: string;
+  description?: string;
+  fields: FormField[];
+  successMessage: string;
+  recipientEmail: string;
+}
+
 export interface CarouselProps {
   items: Array<{
     id: string;

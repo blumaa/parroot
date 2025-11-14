@@ -1,0 +1,10 @@
+.cta-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cta-description {
+  max-width: 600px;
+}

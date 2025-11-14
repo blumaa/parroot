@@ -29,7 +29,7 @@ const SEGMENT_TYPES = [
     icon: '📣',
   },
   {
-    type: 'contact-form',
+    type: 'form',
     label: 'Contact Form',
     description: 'Contact or inquiry form',
     icon: '📧',

@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Button, Heading, Text, Divider } from "@mond-design-system/theme";
-import { Input, Textarea } from "@mond-design-system/theme/client";
+import { Input } from "@mond-design-system/theme/client";
 import {
   createSegment,
   updateSegment,
@@ -15,6 +15,8 @@ import { useToast } from "@/app/providers/ToastProvider";
 import { TextBlockSegmentForm } from "./segment-forms/TextBlockSegmentForm";
 import { CarouselSegmentForm } from "./segment-forms/CarouselSegmentForm";
 import { GallerySegmentForm } from "./segment-forms/GallerySegmentForm";
+import { CTASegmentForm } from "./segment-forms/CTASegmentForm";
+import { FormSegmentForm } from "./segment-forms/FormSegmentForm";
 
 const SEGMENT_TYPES: {
   value: SegmentType;
@@ -42,9 +44,9 @@ const SEGMENT_TYPES: {
     description: "Prominent call-to-action section",
   },
   {
-    value: "contact-form",
-    label: "Contact Form",
-    description: "Contact or inquiry form",
+    value: "form",
+    label: "Form",
+    description: "Customizable form with multiple field types",
   },
 ];
 
@@ -192,85 +194,14 @@ export function SegmentForm({
           )}
 
           {type === "cta" && (
-            <>
-              <Input
-                label="Headline"
-                type="text"
-                placeholder="Enter headline"
-                value={(content.headline as string) || ""}
-                onChange={(e) =>
-                  setContent({ ...content, headline: e.target.value })
-                }
-              />
-              <Textarea
-                label="Description"
-                placeholder="Enter description"
-                value={(content.description as string) || ""}
-                onChange={(e) =>
-                  setContent({ ...content, description: e.target.value })
-                }
-                rows={3}
-              />
-              <Input
-                label="Button Text"
-                type="text"
-                placeholder="e.g., Get Started"
-                value={(content.buttonText as string) || ""}
-                onChange={(e) =>
-                  setContent({ ...content, buttonText: e.target.value })
-                }
-              />
-              <Input
-                label="Button URL"
-                type="text"
-                placeholder="e.g., /signup"
-                value={(content.buttonUrl as string) || ""}
-                onChange={(e) =>
-                  setContent({ ...content, buttonUrl: e.target.value })
-                }
-              />
-              <Input
-                label="Background Color (optional)"
-                type="text"
-                placeholder="e.g., #f0f0f0"
-                value={(content.backgroundColor as string) || ""}
-                onChange={(e) =>
-                  setContent({ ...content, backgroundColor: e.target.value })
-                }
-              />
-            </>
+            <CTASegmentForm
+              content={content}
+              onContentChange={setContent}
+            />
           )}
 
-          {type === "contact-form" && (
-            <>
-              <Input
-                label="Form Title"
-                type="text"
-                placeholder="e.g., Contact Us"
-                value={(content.formTitle as string) || ""}
-                onChange={(e) =>
-                  setContent({ ...content, formTitle: e.target.value })
-                }
-              />
-              <Input
-                label="Submit Button Text"
-                type="text"
-                placeholder="e.g., Send Message"
-                value={(content.submitButtonText as string) || ""}
-                onChange={(e) =>
-                  setContent({ ...content, submitButtonText: e.target.value })
-                }
-              />
-              <Input
-                label="Email Recipient"
-                type="email"
-                placeholder="e.g., contact@example.com"
-                value={(content.emailRecipient as string) || ""}
-                onChange={(e) =>
-                  setContent({ ...content, emailRecipient: e.target.value })
-                }
-              />
-            </>
+          {type === "form" && (
+            <FormSegmentForm content={content} onContentChange={setContent} />
           )}
 
           {type === "carousel" && (

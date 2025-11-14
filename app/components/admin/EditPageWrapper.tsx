@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Text } from '@mond-design-system/theme';
+import { Box, Text, Spinner } from '@mond-design-system/theme';
 import { PageForm } from './PageForm';
 import { getPageById, type Page } from '@/app/utils/firestore-pages';
 
@@ -40,8 +40,8 @@ export function EditPageWrapper({ pageId, userId }: EditPageWrapperProps) {
 
   if (loading) {
     return (
-      <Box padding="4">
-        <Text>Loading page...</Text>
+      <Box padding="8" display="flex" justifyContent="center">
+        <Spinner size="lg" label="Loading page..." />
       </Box>
     );
   }

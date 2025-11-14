@@ -13,7 +13,7 @@ export type SegmentType =
   | 'testimonials'
   | 'faq'
   | 'team'
-  | 'contact-form';
+  | 'form';
 
 /**
  * Base segment configuration interface
