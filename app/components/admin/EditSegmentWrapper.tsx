@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Box, Text, Spinner } from '@mond-design-system/theme';
 import { SegmentForm } from './SegmentForm';
-import { getSegmentById, type Segment } from '@/app/utils/firestore-segments';
+import type { Segment } from '@/app/types';
+import { getSegmentByIdAction } from '@/app/actions/segments';
 
 interface EditSegmentWrapperProps {
   segmentId: string;
@@ -19,7 +20,7 @@ export function EditSegmentWrapper({ segmentId, userId }: EditSegmentWrapperProp
     const loadSegment = async () => {
       try {
         setLoading(true);
-        const fetchedSegment = await getSegmentById(segmentId);
+        const fetchedSegment = await getSegmentByIdAction(segmentId);
 
         if (!fetchedSegment) {
           setError('Segment not found');

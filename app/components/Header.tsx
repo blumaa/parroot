@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Box, Button, Heading, Avatar } from '@mond-design-system/theme';
-import type { MenuItem } from '@/app/utils/firestore-navigation';
-import type { Page } from '@/app/utils/firestore-pages';
+import type { MenuItem, Page } from '@/app/types';
 import { HeaderAdminArea } from './HeaderAdminArea';
 
 interface HeaderProps {
@@ -58,7 +57,7 @@ export function Header({ menuItems, pages, user, siteName = 'Parroot', logoUrl, 
                   href={`/${item.page!.slug}`}
                   className="no-underline"
                 >
-                  <Button variant={item.variant} size={item.size} corners='rounded'>
+                  <Button variant={item.variant} size={item.size}>
                     {item.page!.title}
                   </Button>
                 </Link>

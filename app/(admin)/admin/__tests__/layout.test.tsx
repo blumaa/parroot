@@ -22,6 +22,24 @@ vi.mock('@/app/lib/dal', () => ({
   getUser: vi.fn(),
 }));
 
+// Mock getSiteSettings
+vi.mock('@/app/lib/data-access', () => ({
+  getSiteSettings: vi.fn().mockResolvedValue({
+    id: 'default',
+    siteName: 'Test Site',
+    siteDescription: 'Test Description',
+    contactEmail: 'test@example.com',
+    languages: { default: 'en', supported: ['en'] },
+    integrations: {},
+    logoUrl: '',
+    stickyHeader: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: 'test',
+    updatedBy: 'test',
+  }),
+}));
+
 // Mock Next.js redirect
 const mockRedirect = vi.fn();
 vi.mock('next/navigation', () => ({
@@ -38,7 +56,6 @@ describe('AdminLayout', () => {
     vi.mocked(getUser).mockResolvedValue({
       id: '123',
       email: 'test@example.com',
-      role: 'admin',
     });
 
     const layout = await AdminLayout({ children: <div>Test Content</div> });
@@ -67,7 +84,6 @@ describe('AdminLayout', () => {
     const mockUser = {
       id: '456',
       email: 'admin@example.com',
-      role: 'admin' as const,
     };
     vi.mocked(getUser).mockResolvedValue(mockUser);
 
@@ -82,7 +98,6 @@ describe('AdminLayout', () => {
     vi.mocked(getUser).mockResolvedValue({
       id: '789',
       email: 'user@example.com',
-      role: 'admin',
     });
 
     const testContent = <div data-testid="test-content">Custom Content</div>;

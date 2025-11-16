@@ -6,19 +6,31 @@ import { Box, Button, Heading } from '@mond-design-system/theme';
 
 interface AdminNavigationProps {
   siteName?: string;
+  hasPostsSegments: boolean;
+  hasFormSubmissions: boolean;
 }
 
-export function AdminNavigation({ siteName = 'Parroot' }: AdminNavigationProps) {
+export function AdminNavigation({
+  siteName = 'Parroot',
+  hasPostsSegments,
+  hasFormSubmissions,
+}: AdminNavigationProps) {
   const pathname = usePathname();
 
-  const navItems = [
-    { label: 'Dashboard', href: '/admin' },
-    { label: 'Pages', href: '/admin/pages' },
-    { label: 'Segments', href: '/admin/segments' },
-    { label: 'Navigation', href: '/admin/navigation' },
-    { label: 'Settings', href: '/admin/settings' },
-    { label: 'Mailbox', href: '/admin/mailbox' },
+  const allNavItems = [
+    { label: 'Dashboard', href: '/admin', alwaysShow: true },
+    { label: 'Pages', href: '/admin/pages', alwaysShow: true },
+    { label: 'Segments', href: '/admin/segments', alwaysShow: true },
+    { label: 'Posts', href: '/admin/posts', alwaysShow: false, condition: hasPostsSegments },
+    { label: 'Site Menu', href: '/admin/navigation', alwaysShow: true },
+    { label: 'Mailbox', href: '/admin/mailbox', alwaysShow: false, condition: hasFormSubmissions },
+    { label: 'Site Settings', href: '/admin/settings', alwaysShow: true },
   ];
+
+  // Filter nav items based on conditional display
+  const navItems = allNavItems.filter(
+    (item) => item.alwaysShow || item.condition
+  );
 
   return (
     <Box
@@ -27,7 +39,7 @@ export function AdminNavigation({ siteName = 'Parroot' }: AdminNavigationProps) 
       display="flex"
       flexDirection="column"
       gap="lg"
-      className="bg-gray-50 border-r border-gray-200 w-64"
+      border="default"
     >
       <Heading level={2}>{siteName} Admin</Heading>
       <Box display="flex" flexDirection="column" gap="sm">

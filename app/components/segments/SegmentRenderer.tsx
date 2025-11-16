@@ -1,16 +1,18 @@
 "use client";
 
 import { Box, Text } from "@mond-design-system/theme";
-import type { Segment } from "@/app/utils/firestore-segments";
+import type { Segment, Post } from "@/app/types";
 import { TextBlockSegmentRenderer } from "./TextBlockSegmentRenderer";
 import { CarouselSegmentRenderer } from "./CarouselSegmentRenderer";
 import { GallerySegmentRenderer } from "./GallerySegmentRenderer";
 import { CTASegmentRenderer } from "./CTASegmentRenderer";
 import { FormSegmentRenderer } from "./FormSegmentRenderer";
+import { PostsSegmentRenderer } from "./PostsSegmentRenderer";
 
 interface SegmentRendererProps {
   segment: Segment;
   locale?: string;
+  posts?: Post[];
 }
 
 /**
@@ -23,6 +25,7 @@ interface SegmentRendererProps {
 export function SegmentRenderer({
   segment,
   locale = "en",
+  posts,
 }: SegmentRendererProps) {
   // Get localized content if available
   const content = segment.content?.[locale] || segment.content?.en || {};
@@ -68,6 +71,9 @@ export function SegmentRenderer({
 
     case "form":
       return <FormSegmentRenderer content={content} />;
+
+    case "posts":
+      return <PostsSegmentRenderer posts={posts || []} content={content} />;
 
     default:
       return (

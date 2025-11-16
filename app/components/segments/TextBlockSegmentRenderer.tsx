@@ -1,5 +1,5 @@
 import { Box, Heading } from '@mond-design-system/theme';
-import './TextBlockSegmentRenderer.css';
+import '@/app/styles/tiptap-content.css';
 
 interface TextBlockSegmentRendererProps {
   content: {

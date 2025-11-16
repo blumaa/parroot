@@ -104,7 +104,7 @@ export function CarouselSegmentForm({
 
         <Box display="flex" flexDirection="column" gap="sm">
           <Text variant="body-sm" as="label">Size</Text>
-          <Box display="flex" gap="sm" style={{ flexWrap: "wrap" }}>
+          <Box display="flex" gap="sm" flexWrap="wrap">
             <Button
               type="button"
               size="sm"
@@ -153,10 +153,8 @@ export function CarouselSegmentForm({
             <Box
               key={slide.id}
               padding="4"
-              style={{
-                border: "1px solid var(--mond-color-border-default)",
-                borderRadius: "var(--mond-radius-md)",
-              }}
+              border="default"
+              corners="default"
             >
               <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="3">
                 <Heading level={4}>Slide {index + 1}</Heading>

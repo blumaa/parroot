@@ -201,7 +201,7 @@ export function FormSegmentRenderer({ content, isPreview = false }: FormSegmentR
 
   return (
     <Box padding="4" display="flex" justifyContent="center">
-      <Box style={{ maxWidth: '600px', width: '100%' }}>
+      <Box width="full">
         {isPreview ? (
           formFields
         ) : (

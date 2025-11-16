@@ -102,7 +102,7 @@ export function GallerySegmentForm({
 
         <Box display="flex" flexDirection="column" gap="sm">
           <Text variant="body-sm" as="label">Images per Row</Text>
-          <Box display="flex" gap="sm" style={{ flexWrap: "wrap" }}>
+          <Box display="flex" gap="sm" flexWrap="wrap">
             <Button
               type="button"
               size="sm"
@@ -141,20 +141,16 @@ export function GallerySegmentForm({
         <Box display="flex" flexDirection="column" gap="md">
           {/* Grid Preview of Images */}
           <Box
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-              gap: 'var(--mond-spacing-4)',
-            }}
+            display="grid"
+            gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+            gap="lg"
           >
             {images.map((image, index) => (
               <Box
                 key={image.id}
                 padding="3"
-                style={{
-                  border: "1px solid var(--mond-color-border-default)",
-                  borderRadius: "var(--mond-radius-md)",
-                }}
+                border="default"
+                corners="default"
               >
                 <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="2">
                   <Text variant="body-sm" weight="medium">Image {index + 1}</Text>
@@ -193,7 +189,7 @@ export function GallerySegmentForm({
                 <Box display="flex" flexDirection="column" gap="sm">
                   {/* Image Preview */}
                   {image.imageUrl && (
-                    <Box
+                    <div
                       style={{
                         width: '100%',
                         aspectRatio: '4 / 3',

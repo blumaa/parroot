@@ -182,10 +182,8 @@ export function FormSegmentForm({
             display="flex"
             flexDirection="column"
             gap="sm"
-            style={{
-              border: '1px solid var(--mond-color-border-default)',
-              borderRadius: 'var(--mond-radius-md)',
-            }}
+            border="default"
+            corners="default"
           >
             <Box display="flex" justifyContent="space-between" alignItems="center">
               <Text variant="body-sm" weight="medium">
@@ -223,7 +221,7 @@ export function FormSegmentForm({
 
             <Box display="flex" flexDirection="column" gap="sm">
               <Box display="flex" gap="sm">
-                <Box style={{ flex: 1 }}>
+                <Box flex="1">
                   <Input
                     label="Label"
                     type="text"
@@ -232,7 +230,7 @@ export function FormSegmentForm({
                     onChange={(e) => handleFieldChange(field.id, { label: e.target.value })}
                   />
                 </Box>
-                <Box style={{ flex: 1 }}>
+                <Box flex="1">
                   <label htmlFor={`field-type-${field.id}`}>
                     <Text variant="body-sm" weight="medium">
                       Field Type
@@ -308,11 +306,8 @@ export function FormSegmentForm({
             <Heading level={4}>Live Preview</Heading>
             <Box
               padding="4"
-              style={{
-                border: '1px solid var(--mond-color-border-default)',
-                borderRadius: 'var(--mond-radius-md)',
-                backgroundColor: 'var(--mond-color-surface-secondary)',
-              }}
+              border="default"
+              corners="default"
             >
               <FormSegmentRenderer content={content} isPreview={true} />
             </Box>

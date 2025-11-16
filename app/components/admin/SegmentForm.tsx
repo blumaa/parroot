@@ -4,19 +4,15 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Button, Heading, Text, Divider } from "@mond-design-system/theme";
 import { Input } from "@mond-design-system/theme/client";
-import {
-  createSegment,
-  updateSegment,
-  type Segment,
-  type SegmentInput,
-  type SegmentType,
-} from "@/app/utils/firestore-segments";
+import type { Segment, SegmentType } from "@/app/types";
+import { createSegmentAction, updateSegmentAction } from "@/app/actions/segments";
 import { useToast } from "@/app/providers/ToastProvider";
 import { TextBlockSegmentForm } from "./segment-forms/TextBlockSegmentForm";
 import { CarouselSegmentForm } from "./segment-forms/CarouselSegmentForm";
 import { GallerySegmentForm } from "./segment-forms/GallerySegmentForm";
 import { CTASegmentForm } from "./segment-forms/CTASegmentForm";
 import { FormSegmentForm } from "./segment-forms/FormSegmentForm";
+import { PostsSegmentForm } from "./segment-forms/PostsSegmentForm";
 
 const SEGMENT_TYPES: {
   value: SegmentType;
@@ -47,6 +43,11 @@ const SEGMENT_TYPES: {
     value: "form",
     label: "Form",
     description: "Customizable form with multiple field types",
+  },
+  {
+    value: "posts",
+    label: "Posts",
+    description: "Display and manage a collection of posts",
   },
 ];
 
@@ -92,7 +93,7 @@ export function SegmentForm({
     setLoading(true);
 
     try {
-      const segmentInput: SegmentInput = {
+      const segmentData = {
         name,
         type,
         status,
@@ -100,12 +101,21 @@ export function SegmentForm({
         content: { en: content },
       };
 
+      let result;
       if (segment) {
-        await updateSegment(segment.id, segmentInput, userId);
-        showSuccess("Success", "Segment updated successfully");
+        result = await updateSegmentAction(segment.id, segmentData);
+        if (result.success) {
+          showSuccess("Success", "Segment updated successfully");
+        } else {
+          throw new Error(result.error || "Failed to update segment");
+        }
       } else {
-        await createSegment(segmentInput, userId);
-        showSuccess("Success", "Segment created successfully");
+        result = await createSegmentAction(segmentData);
+        if (result.success) {
+          showSuccess("Success", "Segment created successfully");
+        } else {
+          throw new Error(result.error || "Failed to create segment");
+        }
       }
 
       router.push("/admin/segments");
@@ -146,8 +156,6 @@ export function SegmentForm({
 
         {/* Basic Info */}
         <Box display="flex" gap="md">
-          {/* <Heading level={3}>Basic Information</Heading> */}
-
           <Box display="flex" flexDirection="column" gap="sm">
             <Text as="label">Name</Text>
             <Input
@@ -213,6 +221,13 @@ export function SegmentForm({
 
           {type === "gallery" && (
             <GallerySegmentForm
+              content={content}
+              onContentChange={setContent}
+            />
+          )}
+
+          {type === "posts" && (
+            <PostsSegmentForm
               content={content}
               onContentChange={setContent}
             />

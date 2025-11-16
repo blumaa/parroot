@@ -1,11 +1,11 @@
 'use server';
 
-import { requireAdmin } from '@/app/lib/dal';
-import { updateSiteSettings } from '@/app/utils/firestore-settings';
+import { verifySession } from '@/app/lib/dal';
+import { updateSiteSettings } from '@/app/lib/data-access';
 import { revalidatePath } from 'next/cache';
 
 export async function updateSettings(formData: FormData) {
-  const user = await requireAdmin();
+  const { userId } = await verifySession();
 
   const siteName = formData.get('siteName') as string;
   const siteDescription = formData.get('siteDescription') as string;
@@ -40,7 +40,7 @@ export async function updateSettings(formData: FormData) {
       settingsData.googleAnalyticsId = googleAnalyticsId;
     }
 
-    await updateSiteSettings(settingsData, user.id);
+    await updateSiteSettings(settingsData, userId);
 
     // Revalidate all pages that use settings
     revalidatePath('/admin/settings');

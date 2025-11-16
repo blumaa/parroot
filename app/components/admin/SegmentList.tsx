@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Box, Button, Text, Heading, Badge, Spinner } from '@mond-design-system/theme';
 import { Input, Modal, ModalBody, ModalFooter } from '@mond-design-system/theme/client';
-import { getSegments, deleteSegment, type Segment, type SegmentType } from '@/app/utils/firestore-segments';
+import type { Segment, SegmentType } from '@/app/types';
+import { deleteSegmentAction, getSegmentsAction } from '@/app/actions/segments';
 import { useToast } from '@/app/providers/ToastProvider';
 
 const SEGMENT_TYPE_LABELS: Record<SegmentType, string> = {
@@ -17,16 +18,18 @@ const SEGMENT_TYPE_LABELS: Record<SegmentType, string> = {
   faq: 'FAQ',
   team: 'Team',
   'form': 'Form',
+  'posts': 'Posts',
 };
 
 interface SegmentListProps {
   onDelete?: () => void;
+  initialSegments?: Segment[];
 }
 
-export function SegmentList({ onDelete }: SegmentListProps) {
-  const [segments, setSegments] = useState<Segment[]>([]);
-  const [filteredSegments, setFilteredSegments] = useState<Segment[]>([]);
-  const [loading, setLoading] = useState(true);
+export function SegmentList({ onDelete, initialSegments = [] }: SegmentListProps) {
+  const [segments, setSegments] = useState<Segment[]>(initialSegments);
+  const [filteredSegments, setFilteredSegments] = useState<Segment[]>(initialSegments);
+  const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'published'>('all');
   const [typeFilter, setTypeFilter] = useState<SegmentType | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,7 +39,7 @@ export function SegmentList({ onDelete }: SegmentListProps) {
   const loadSegments = useCallback(async () => {
     try {
       setLoading(true);
-      const fetchedSegments = await getSegments();
+      const fetchedSegments = await getSegmentsAction();
       setSegments(fetchedSegments);
     } catch (error) {
       showError('Error', 'Failed to load segments');
@@ -68,9 +71,12 @@ export function SegmentList({ onDelete }: SegmentListProps) {
     setFilteredSegments(filtered);
   }, [segments, statusFilter, typeFilter, searchQuery]);
 
+  // Only load segments if initialSegments was empty
   useEffect(() => {
-    loadSegments();
-  }, [loadSegments]);
+    if (initialSegments.length === 0) {
+      loadSegments();
+    }
+  }, [initialSegments.length, loadSegments]);
 
   useEffect(() => {
     filterSegments();
@@ -78,11 +84,16 @@ export function SegmentList({ onDelete }: SegmentListProps) {
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteSegment(id);
-      showSuccess('Success', 'Segment deleted successfully');
-      setDeleteConfirm(null);
-      await loadSegments();
-      onDelete?.();
+      const result = await deleteSegmentAction(id);
+      if (result.success) {
+        showSuccess('Success', 'Segment deleted successfully');
+        setDeleteConfirm(null);
+        // Remove from local state
+        setSegments(segments.filter(s => s.id !== id));
+        onDelete?.();
+      } else {
+        showError('Error', result.error || 'Failed to delete segment');
+      }
     } catch (error) {
       showError('Error', 'Failed to delete segment');
       console.error('Error deleting segment:', error);

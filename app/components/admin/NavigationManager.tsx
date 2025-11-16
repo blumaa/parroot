@@ -3,16 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Box, Button, Heading, Text, Spinner } from '@mond-design-system/theme';
 import { Select, Modal, ModalBody, ModalFooter } from '@mond-design-system/theme/client';
-import {
-  getMenuItems,
-  createMenuItem,
-  updateMenuItem,
-  deleteMenuItem,
-  type MenuItem,
-  type ButtonVariant,
-  type ButtonSize,
-} from '@/app/utils/firestore-navigation';
-import { getPages, type Page } from '@/app/utils/firestore-pages';
+import type { MenuItem, Page, ButtonVariant, ButtonSize } from '@/app/types';
+import { getMenuItemsAction, createMenuItemAction, updateMenuItemAction, deleteMenuItemAction, reorderMenuItemsAction } from '@/app/actions/navigation';
+import { getPagesAction } from '@/app/actions/pages';
 import { useToast } from '@/app/providers/ToastProvider';
 
 const VARIANT_OPTIONS: Array<{ value: ButtonVariant; label: string }> = [
@@ -31,24 +24,27 @@ const SIZE_OPTIONS: Array<{ value: ButtonSize; label: string }> = [
 
 interface NavigationManagerProps {
   userId: string;
+  initialMenuItems?: MenuItem[];
+  initialPages?: Page[];
 }
 
-export function NavigationManager({ userId }: NavigationManagerProps) {
+export function NavigationManager({ userId, initialMenuItems = [], initialPages = [] }: NavigationManagerProps) {
   const { showSuccess, showError } = useToast();
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [availablePages, setAvailablePages] = useState<Page[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems);
+  const [availablePages, setAvailablePages] = useState<Page[]>(initialPages);
+  const [loading, setLoading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const [items, pages] = await Promise.all([
-        getMenuItems(),
-        getPages({ status: 'published' }),
+      const [items, allPages] = await Promise.all([
+        getMenuItemsAction(),
+        getPagesAction(),
       ]);
+      const publishedPages = allPages.filter(p => p.status === 'published');
       setMenuItems(items);
-      setAvailablePages(pages);
+      setAvailablePages(publishedPages);
     } catch (error) {
       console.error('Error loading data:', error);
       showError('Error', 'Failed to load navigation data');
@@ -57,9 +53,12 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
     }
   }, [showError]);
 
+  // Only load data if initialMenuItems and initialPages were empty
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (initialMenuItems.length === 0 && initialPages.length === 0) {
+      loadData();
+    }
+  }, [initialMenuItems.length, initialPages.length, loadData]);
 
   const handleAddPage = async (pageId: string) => {
     try {
@@ -68,20 +67,21 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
 
       const maxOrder = menuItems.length > 0 ? Math.max(...menuItems.map((m) => m.order)) : -1;
 
-      await createMenuItem(
-        {
-          pageId: page.id,
-          label: page.title,
-          order: maxOrder + 1,
-          visible: true,
-          variant: 'ghost',
-          size: 'md',
-        },
-        userId
-      );
+      const result = await createMenuItemAction({
+        pageId: page.id,
+        label: page.title,
+        order: maxOrder + 1,
+        visible: true,
+        variant: 'ghost',
+        size: 'md',
+      });
 
-      showSuccess('Success', 'Page added to navigation');
-      await loadData();
+      if (result.success) {
+        showSuccess('Success', 'Page added to navigation');
+        await loadData();
+      } else {
+        showError('Error', result.error || 'Failed to add page to navigation');
+      }
     } catch (error) {
       console.error('Error adding page:', error);
       showError('Error', 'Failed to add page to navigation');
@@ -90,10 +90,15 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
 
   const handleRemove = async (id: string) => {
     try {
-      await deleteMenuItem(id);
-      showSuccess('Success', 'Menu item removed');
-      setDeleteConfirm(null);
-      await loadData();
+      const result = await deleteMenuItemAction(id);
+      if (result.success) {
+        showSuccess('Success', 'Menu item removed');
+        setDeleteConfirm(null);
+        // Remove from local state
+        setMenuItems(menuItems.filter(item => item.id !== id));
+      } else {
+        showError('Error', result.error || 'Failed to remove menu item');
+      }
     } catch (error) {
       console.error('Error removing menu item:', error);
       showError('Error', 'Failed to remove menu item');
@@ -112,10 +117,13 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
         order: idx,
       }));
 
-      const { reorderMenuItems } = await import('@/app/utils/firestore-navigation');
-      await reorderMenuItems(updates, userId);
-      showSuccess('Success', 'Menu item moved up');
-      await loadData();
+      const result = await reorderMenuItemsAction(updates);
+      if (result.success) {
+        showSuccess('Success', 'Menu items reordered');
+        await loadData();
+      } else {
+        throw new Error(result.error || 'Failed to reorder');
+      }
     } catch (error) {
       console.error('Error reordering:', error);
       showError('Error', 'Failed to reorder menu items');
@@ -134,10 +142,13 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
         order: idx,
       }));
 
-      const { reorderMenuItems } = await import('@/app/utils/firestore-navigation');
-      await reorderMenuItems(updates, userId);
-      showSuccess('Success', 'Menu item moved down');
-      await loadData();
+      const result = await reorderMenuItemsAction(updates);
+      if (result.success) {
+        showSuccess('Success', 'Menu items reordered');
+        await loadData();
+      } else {
+        throw new Error(result.error || 'Failed to reorder');
+      }
     } catch (error) {
       console.error('Error reordering:', error);
       showError('Error', 'Failed to reorder menu items');
@@ -146,9 +157,16 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
 
   const handleVariantChange = async (itemId: string, variant: ButtonVariant) => {
     try {
-      await updateMenuItem(itemId, { variant }, userId);
-      showSuccess('Success', 'Variant updated');
-      await loadData();
+      const result = await updateMenuItemAction(itemId, { variant });
+      if (result.success) {
+        showSuccess('Success', 'Variant updated');
+        // Update local state
+        setMenuItems(menuItems.map(item =>
+          item.id === itemId ? { ...item, variant } : item
+        ));
+      } else {
+        showError('Error', result.error || 'Failed to update variant');
+      }
     } catch (error) {
       console.error('Error updating variant:', error);
       showError('Error', 'Failed to update variant');
@@ -157,9 +175,16 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
 
   const handleSizeChange = async (itemId: string, size: ButtonSize) => {
     try {
-      await updateMenuItem(itemId, { size }, userId);
-      showSuccess('Success', 'Size updated');
-      await loadData();
+      const result = await updateMenuItemAction(itemId, { size });
+      if (result.success) {
+        showSuccess('Success', 'Size updated');
+        // Update local state
+        setMenuItems(menuItems.map(item =>
+          item.id === itemId ? { ...item, size } : item
+        ));
+      } else {
+        showError('Error', result.error || 'Failed to update size');
+      }
     } catch (error) {
       console.error('Error updating size:', error);
       showError('Error', 'Failed to update size');
@@ -168,9 +193,16 @@ export function NavigationManager({ userId }: NavigationManagerProps) {
 
   const handleVisibilityToggle = async (itemId: string, visible: boolean) => {
     try {
-      await updateMenuItem(itemId, { visible }, userId);
-      showSuccess('Success', visible ? 'Menu item shown' : 'Menu item hidden');
-      await loadData();
+      const result = await updateMenuItemAction(itemId, { visible });
+      if (result.success) {
+        showSuccess('Success', visible ? 'Menu item shown' : 'Menu item hidden');
+        // Update local state
+        setMenuItems(menuItems.map(item =>
+          item.id === itemId ? { ...item, visible } : item
+        ));
+      } else {
+        showError('Error', result.error || 'Failed to update visibility');
+      }
     } catch (error) {
       console.error('Error updating visibility:', error);
       showError('Error', 'Failed to update visibility');

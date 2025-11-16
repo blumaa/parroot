@@ -4,16 +4,11 @@ import { useState, useEffect, FormEvent, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Heading, Text } from '@mond-design-system/theme';
 import { Input, Textarea } from '@mond-design-system/theme/client';
-import {
-  createPage,
-  updatePage,
-  generateSlug,
-  isSlugUnique,
-  type Page,
-  type PageInput,
-} from '@/app/utils/firestore-pages';
-import { getSegments, type Segment } from '@/app/utils/firestore-segments';
+import type { Page, Segment } from '@/app/types';
+import { createPageAction, updatePageAction, checkSlugUniqueAction } from '@/app/actions/pages';
+import { getSegmentsAction } from '@/app/actions/segments';
 import { useToast } from '@/app/providers/ToastProvider';
+import { generateSlug } from '@/app/utils/slug';
 
 interface PageFormProps {
   page?: Page;
@@ -51,8 +46,9 @@ export function PageForm({ page, userId }: PageFormProps) {
   const loadSegments = useCallback(async () => {
     try {
       setLoadingSegments(true);
-      const segments = await getSegments({ status: 'published' });
-      setAvailableSegments(segments);
+      const allSegments = await getSegmentsAction();
+      const publishedSegments = allSegments.filter(s => s.status === 'published');
+      setAvailableSegments(publishedSegments);
     } catch (error) {
       console.error('Error loading segments:', error);
       showError('Error', 'Failed to load segments');
@@ -73,7 +69,7 @@ export function PageForm({ page, userId }: PageFormProps) {
         return;
       }
 
-      const unique = await isSlugUnique(slug, page?.id);
+      const unique = await checkSlugUniqueAction(slug, page?.id);
       if (!unique) {
         setSlugError('This slug is already in use');
       } else {
@@ -103,7 +99,7 @@ export function PageForm({ page, userId }: PageFormProps) {
     setLoading(true);
 
     try {
-      const pageInput: PageInput = {
+      const pageData = {
         title,
         slug,
         description,
@@ -111,12 +107,21 @@ export function PageForm({ page, userId }: PageFormProps) {
         segments: selectedSegmentIds,
       };
 
+      let result;
       if (page) {
-        await updatePage(page.id, pageInput, userId);
-        showSuccess('Success', 'Page updated successfully');
+        result = await updatePageAction(page.id, pageData);
+        if (result.success) {
+          showSuccess('Success', 'Page updated successfully');
+        } else {
+          throw new Error(result.error || 'Failed to update page');
+        }
       } else {
-        await createPage(pageInput, userId);
-        showSuccess('Success', 'Page created successfully');
+        result = await createPageAction(pageData);
+        if (result.success) {
+          showSuccess('Success', 'Page created successfully');
+        } else {
+          throw new Error(result.error || 'Failed to create page');
+        }
       }
 
       router.push('/admin/pages');

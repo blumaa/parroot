@@ -1,5 +1,6 @@
 import { verifySession } from '@/app/lib/dal';
 import { NavigationManager } from '@/app/components/admin/NavigationManager';
+import { getMenuItems, getPages } from '@/app/lib/data-access';
 import { redirect } from 'next/navigation';
 
 export default async function NavigationPage() {
@@ -9,5 +10,10 @@ export default async function NavigationPage() {
     redirect('/login');
   }
 
-  return <NavigationManager userId={session.userId} />;
+  const [menuItems, pages] = await Promise.all([
+    getMenuItems(),
+    getPages()
+  ]);
+
+  return <NavigationManager userId={session.userId} initialMenuItems={menuItems} initialPages={pages} />;
 }

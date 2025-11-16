@@ -1,13 +1,9 @@
 "use client";
 
-import { Box, Text, Button, Divider, Heading } from "@mond-design-system/theme";
+import { Box, Text, Heading } from "@mond-design-system/theme";
 import { Input, Radio, Select } from "@mond-design-system/theme/client";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import TextAlign from "@tiptap/extension-text-align";
-import { useEffect } from "react";
 import { TextBlockSegmentRenderer } from "@/app/components/segments/TextBlockSegmentRenderer";
-import "./TextBlockSegmentForm.css";
+import { RichTextEditor } from "../RichTextEditor";
 
 interface TextBlockSegmentFormProps {
   content: Record<string, unknown>;
@@ -44,44 +40,6 @@ export function TextBlockSegmentForm({
   content,
   onContentChange,
 }: TextBlockSegmentFormProps) {
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        paragraph: {
-          HTMLAttributes: {
-            class: "text-base",
-          },
-        },
-        hardBreak: {
-          keepMarks: true,
-        },
-      }),
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-    ],
-    content: (content.body as string) || "<p></p>",
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        class: "prose prose-sm max-w-none focus:outline-none min-h-[200px] p-3",
-      },
-    },
-    onUpdate: ({ editor }) => {
-      onContentChange({
-        ...content,
-        body: editor.getHTML(),
-      });
-    },
-  });
-
-  // Update editor content when content prop changes
-  useEffect(() => {
-    if (editor && content.body !== editor.getHTML()) {
-      editor.commands.setContent((content.body as string) || "");
-    }
-  }, [content.body, editor]);
-
   const handleFieldChange = (field: string, value: unknown) => {
     onContentChange({
       ...content,
@@ -170,110 +128,13 @@ export function TextBlockSegmentForm({
         />
       </Box>
 
-      {/* TipTap Editor */}
-      <Box>
-        <Text variant="body-sm" semantic="secondary" as="label">
-          Body Content
-        </Text>
-
-        {/* Editor Toolbar */}
-        {editor && (
-          <Box
-            marginTop="2"
-            padding="2"
-            display="flex"
-            gap="xs"
-            className="border rounded-t bg-gray-50"
-          >
-            <Button
-              type="button"
-              size="sm"
-              variant={editor.isActive("bold") ? "primary" : "outline"}
-              onClick={() => editor.chain().focus().toggleBold().run()}
-            >
-              Bold
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={editor.isActive("italic") ? "primary" : "outline"}
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-            >
-              Italic
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={editor.isActive("strike") ? "primary" : "outline"}
-              onClick={() => editor.chain().focus().toggleStrike().run()}
-            >
-              Strike
-            </Button>
-            <Divider orientation="vertical" margin="0" />
-            <Button
-              type="button"
-              size="sm"
-              variant={editor.isActive("bulletList") ? "primary" : "outline"}
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
-            >
-              • List
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={editor.isActive("orderedList") ? "primary" : "outline"}
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            >
-              1. List
-            </Button>
-            <Divider orientation="vertical" margin="0" />
-            <Button
-              type="button"
-              size="sm"
-              variant={
-                editor.isActive({ textAlign: "left" }) ? "primary" : "outline"
-              }
-              onClick={() => editor.chain().focus().setTextAlign("left").run()}
-            >
-              Left
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={
-                editor.isActive({ textAlign: "center" }) ? "primary" : "outline"
-              }
-              onClick={() =>
-                editor.chain().focus().setTextAlign("center").run()
-              }
-            >
-              Center
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={
-                editor.isActive({ textAlign: "right" }) ? "primary" : "outline"
-              }
-              onClick={() => editor.chain().focus().setTextAlign("right").run()}
-            >
-              Right
-            </Button>
-          </Box>
-        )}
-
-        {/* Editor Content */}
-        <Box className="border border-t-0 rounded-b min-h-[200px] bg-white relative">
-          {editor && editor.isEmpty && (
-            <Box className="absolute top-3 left-3 text-gray-400 pointer-events-none">
-              Start typing your content here...
-            </Box>
-          )}
-          <EditorContent editor={editor} />
-        </Box>
-      </Box>
-
-      <Divider variant="strong" />
+      {/* Body Content Editor */}
+      <RichTextEditor
+        content={(content.body as string) || ""}
+        onChange={(html) => handleFieldChange("body", html)}
+        label="Body Content"
+        placeholder="Start typing your content here..."
+      />
 
       {/* Live Preview */}
       <Box>

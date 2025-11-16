@@ -14,17 +14,21 @@ export type PageStatus = 'draft' | 'published' | 'archived';
 // Blog post status
 export type BlogPostStatus = 'draft' | 'published';
 
+// Post status
+export type PostStatus = 'draft' | 'published';
+
 // Segment types
 export type SegmentType =
   | 'carousel'
   | 'gallery'
-  | 'textBlock'
-  | 'title'
-  | 'divider'
+  | 'text-block'
+  | 'hero'
+  | 'cta'
+  | 'testimonials'
+  | 'faq'
+  | 'team'
   | 'form'
-  | 'paypalDonate'
-  | 'blogDisplay'
-  | 'socialLinks';
+  | 'posts';
 
 // Menu item types
 export type MenuItemType = 'page' | 'external' | 'dropdown';
@@ -46,30 +50,45 @@ export interface User {
 // ============================================
 export interface Page {
   id: string;
-  title: MultiLang;
+  title: string;
   slug: string;
-  status: PageStatus;
-  segmentIds: string[]; // References to Segment collection
-  metadata: {
-    metaTitle?: MultiLang;
-    metaDescription?: MultiLang;
-    ogImage?: string;
-  };
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-  publishedAt?: Timestamp;
+  description?: string;
+  status: 'draft' | 'published';
+  segments: string[]; // Array of segment IDs
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  updatedBy: string;
 }
 
 // ============================================
 // SEGMENT
 // ============================================
+export interface SegmentConfig {
+  // Common config properties that all segments might need
+  backgroundColor?: string;
+  textColor?: string;
+  padding?: string;
+  margin?: string;
+  className?: string;
+}
+
+export interface LocalizedContent {
+  en: Record<string, unknown>;
+  [locale: string]: Record<string, unknown>;
+}
+
 export interface Segment {
   id: string;
   name: string; // User-friendly name like "Summer Sale Carousel"
   type: SegmentType;
-  props: Record<string, unknown>; // Type-specific props
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  config: SegmentConfig & Record<string, unknown>; // Type-specific config
+  content?: LocalizedContent; // Optional multi-language content
+  status: 'draft' | 'published';
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  updatedBy: string;
 }
 
 // Specific segment prop types
@@ -170,6 +189,11 @@ export interface SocialLinksProps {
   iconSize: 'sm' | 'md' | 'lg';
 }
 
+export interface PostsSegmentProps {
+  title: string;
+  description: string;
+}
+
 // ============================================
 // BLOG POST
 // ============================================
@@ -196,6 +220,24 @@ export interface BlogPost {
 }
 
 // ============================================
+// POST
+// ============================================
+export interface Post {
+  id: string;
+  segmentId: string; // Links post to specific Posts segment
+  title: string;
+  content: string; // Rich HTML content
+  excerpt: string;
+  slug: string;
+  featuredImage?: string;
+  author: string;
+  authorId: string;
+  status: PostStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================
 // NAVIGATION
 // ============================================
 export interface Navigation {
@@ -204,15 +246,21 @@ export interface Navigation {
   items: MenuItem[];
 }
 
+export type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'destructive' | 'warning';
+export type ButtonSize = 'sm' | 'md' | 'lg';
+
 export interface MenuItem {
   id: string;
-  label: MultiLang;
-  type: MenuItemType;
-  pageId?: string;
-  externalUrl?: string;
-  children?: MenuItem[];
+  pageId: string;
+  label: string;
   order: number;
   visible: boolean;
+  variant: ButtonVariant;
+  size: ButtonSize;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  updatedBy: string;
 }
 
 // ============================================
@@ -262,33 +310,37 @@ export interface Media {
 // ============================================
 export interface FormSubmission {
   id: string;
-  formType: string;
-  data: Record<string, unknown>;
-  submittedAt: Timestamp;
+  data: Record<string, string>;
+  recipientEmail: string;
+  submittedAt: Date;
   read: boolean;
-  emailSent: boolean;
 }
 
 // ============================================
 // SITE SETTINGS
 // ============================================
 export interface SiteSettings {
-  id: string; // Singleton - typically 'default'
-  siteName: MultiLang;
-  siteDescription: MultiLang;
+  id: string;
+  // General Settings
+  siteName: string;
+  siteDescription: string;
   contactEmail: string;
-  languages: {
-    default: string;
-    supported: string[];
-  };
-  integrations: {
-    paypal?: {
-      clientId: string;
-      mode: 'sandbox' | 'production';
-    };
-    analytics?: {
-      googleAnalyticsId?: string;
-    };
-  };
-  updatedAt: Timestamp;
+
+  // Header Settings
+  stickyHeader?: boolean;
+
+  // PayPal Integration
+  paypalClientId?: string;
+  paypalMode?: 'sandbox' | 'production';
+
+  // Analytics Integration
+  googleAnalyticsId?: string;
+
+  // Logo and Favicon (URLs to uploaded files)
+  logoUrl?: string;
+  faviconUrl?: string;
+
+  // Timestamps
+  updatedAt: Date;
+  updatedBy: string;
 }

@@ -66,7 +66,7 @@ export function CTASegmentRenderer({ content }: CTASegmentRendererProps) {
 
         {/* Buttons */}
         {(hasPrimaryButton || hasSecondaryButton) && (
-          <Box display="flex" gap="md" style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
+          <Box display="flex" gap="md" flexWrap="wrap" justifyContent="center">
             {hasPrimaryButton && (
               <>
                 {isExternalUrl(ctaContent.primaryButtonUrl!) ? (

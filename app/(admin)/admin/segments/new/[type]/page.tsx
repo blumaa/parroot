@@ -1,7 +1,7 @@
 import { SegmentForm } from '@/app/components/admin/SegmentForm';
 import { getUser } from '@/app/lib/dal';
 import { redirect, notFound } from 'next/navigation';
-import type { SegmentType } from '@/app/utils/firestore-segments';
+import type { SegmentType } from '@/app/types';
 
 const VALID_SEGMENT_TYPES: SegmentType[] = [
   'carousel',
@@ -9,6 +9,7 @@ const VALID_SEGMENT_TYPES: SegmentType[] = [
   'gallery',
   'cta',
   'form',
+  'posts',
 ];
 
 interface NewSegmentTypePageProps {

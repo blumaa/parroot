@@ -10,11 +10,8 @@ import {
   ModalFooter,
 } from "@mond-design-system/theme/client";
 import { useToast } from "@/app/providers/ToastProvider";
-import {
-  getFormSubmissions,
-  deleteFormSubmission,
-  type FormSubmission,
-} from "@/app/utils/firestore-mailbox";
+import { getFormSubmissionsAction, deleteFormSubmissionAction } from "@/app/actions/mailbox";
+import type { FormSubmission } from "@/app/types";
 
 export default function MailboxPage() {
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
@@ -31,7 +28,7 @@ export default function MailboxPage() {
     async function loadSubmissions() {
       setLoading(true);
       try {
-        const data = await getFormSubmissions();
+        const data = await getFormSubmissionsAction();
         setSubmissions(data);
         setFilteredSubmissions(data);
       } catch (error) {
@@ -56,9 +53,7 @@ export default function MailboxPage() {
       const dataMatch = Object.values(submission.data).some((value) =>
         value.toLowerCase().includes(query),
       );
-      const emailMatch = submission.recipientEmail
-        .toLowerCase()
-        .includes(query);
+      const emailMatch = submission.recipientEmail.toLowerCase().includes(query);
       const dateMatch = new Date(submission.submittedAt)
         .toLocaleString()
         .toLowerCase()
@@ -73,7 +68,7 @@ export default function MailboxPage() {
   const handleRefresh = async () => {
     setLoading(true);
     try {
-      const data = await getFormSubmissions();
+      const data = await getFormSubmissionsAction();
       setSubmissions(data);
       setFilteredSubmissions(data);
     } catch (error) {
@@ -86,13 +81,13 @@ export default function MailboxPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const success = await deleteFormSubmission(id);
-      if (success) {
+      const result = await deleteFormSubmissionAction(id);
+      if (result.success) {
         showSuccess("Success", "Submission deleted successfully");
         setDeleteConfirm(null);
         setSubmissions((prev) => prev.filter((s) => s.id !== id));
       } else {
-        showError("Error", "Failed to delete submission");
+        showError("Error", result.error || "Failed to delete submission");
       }
     } catch (error) {
       console.error("Error deleting submission:", error);
@@ -100,8 +95,8 @@ export default function MailboxPage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
+  const formatDate = (date: Date) => {
+    return date.toLocaleString();
   };
 
   const getSubmissionTitle = (submission: FormSubmission) => {
@@ -126,7 +121,7 @@ export default function MailboxPage() {
                 <Text variant="body-sm" weight="bold">
                   {label}:
                 </Text>
-                <Text variant="body">{value || "(empty)"}</Text>
+                <Text variant="body">{String(value) || "(empty)"}</Text>
               </Box>
             ))}
           </Box>
@@ -161,7 +156,7 @@ export default function MailboxPage() {
       </Box>
 
       {/* Search */}
-      <Box style={{ maxWidth: "500px" }}>
+      <Box width="half">
         <Input
           type="text"
           placeholder="Search submissions..."

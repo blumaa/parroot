@@ -206,6 +206,14 @@ bun run test:watch
 bun run test:coverage
 ```
 
+**⚠️ Important**: Always use `bun run test` (NOT `bun test`).
+
+The difference:
+- `bun run test` → Executes `vitest run` from package.json → Uses vitest with proper setup file
+- `bun test` → Uses Bun's native test runner → Doesn't load vitest.setup.ts mocks
+
+The vitest.setup.ts file contains critical mocks for server-only modules that are required for tests to pass.
+
 ## CI/CD Pipeline
 
 The project uses GitHub Actions for continuous integration. On every push to `main` or pull request:

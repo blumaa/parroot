@@ -29,7 +29,8 @@ describe('NewSegmentPage (Segment Type Selection)', () => {
     expect(screen.getByText('Text Block')).toBeInTheDocument();
     expect(screen.getByText('Gallery')).toBeInTheDocument();
     expect(screen.getByText('Call to Action')).toBeInTheDocument();
-    expect(screen.getByText('Contact Form')).toBeInTheDocument();
+    expect(screen.getByText('Form')).toBeInTheDocument();
+    expect(screen.getByText('Posts')).toBeInTheDocument();
   });
 
   it('shows descriptions for each segment type', () => {

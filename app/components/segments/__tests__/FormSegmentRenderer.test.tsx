@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FormSegmentRenderer } from '../FormSegmentRenderer';
-import * as formSubmission from '@/app/actions/form-submission';
+import { ToastProvider } from '@/app/providers/ToastProvider';
 
 // Mock the form submission action
 vi.mock('@/app/actions/form-submission', () => ({
@@ -10,6 +10,7 @@ vi.mock('@/app/actions/form-submission', () => ({
 }));
 
 describe('FormSegmentRenderer', () => {
+
   const mockContent = {
     fields: [
       {
@@ -31,20 +32,25 @@ describe('FormSegmentRenderer', () => {
     recipientEmail: 'test@example.com',
   };
 
-  beforeEach(() => {
-    vi.mocked(formSubmission.submitForm).mockClear();
-    vi.mocked(formSubmission.submitForm).mockResolvedValue({ success: true });
+  const renderWithToast = (ui: React.ReactElement) => {
+    return render(<ToastProvider>{ui}</ToastProvider>);
+  };
+
+  beforeEach(async () => {
+    const { submitForm } = await import('@/app/actions/form-submission');
+    vi.mocked(submitForm).mockClear();
+    vi.mocked(submitForm).mockResolvedValue({ success: true });
   });
 
   it('renders all form fields', () => {
-    render(<FormSegmentRenderer content={mockContent} />);
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
   });
 
   it('renders text input field correctly', () => {
-    render(<FormSegmentRenderer content={mockContent} />);
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     const nameInput = screen.getByLabelText(/name/i);
     expect(nameInput).toHaveAttribute('type', 'text');
@@ -52,7 +58,7 @@ describe('FormSegmentRenderer', () => {
   });
 
   it('renders email input field correctly', () => {
-    render(<FormSegmentRenderer content={mockContent} />);
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     const emailInput = screen.getByLabelText(/email/i);
     expect(emailInput).toHaveAttribute('type', 'email');
@@ -73,7 +79,7 @@ describe('FormSegmentRenderer', () => {
       ],
     };
 
-    render(<FormSegmentRenderer content={content} />);
+    renderWithToast(<FormSegmentRenderer content={content} />);
 
     const textarea = screen.getByLabelText(/message/i);
     expect(textarea.tagName).toBe('TEXTAREA');
@@ -94,7 +100,7 @@ describe('FormSegmentRenderer', () => {
       ],
     };
 
-    render(<FormSegmentRenderer content={content} />);
+    renderWithToast(<FormSegmentRenderer content={content} />);
 
     const select = screen.getByLabelText(/country/i);
     expect(select.tagName).toBe('SELECT');
@@ -117,14 +123,14 @@ describe('FormSegmentRenderer', () => {
       ],
     };
 
-    render(<FormSegmentRenderer content={content} />);
+    renderWithToast(<FormSegmentRenderer content={content} />);
 
     const phoneInput = screen.getByLabelText(/phone/i);
     expect(phoneInput).toHaveAttribute('type', 'tel');
   });
 
   it('shows required indicator for required fields', () => {
-    render(<FormSegmentRenderer content={mockContent} />);
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     // Check that required fields are marked (MDS Input handles this)
     const nameInput = screen.getByLabelText(/name/i);
@@ -132,14 +138,14 @@ describe('FormSegmentRenderer', () => {
   });
 
   it('renders submit button', () => {
-    render(<FormSegmentRenderer content={mockContent} />);
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
   });
 
   it('allows user to fill out form', async () => {
     const user = userEvent.setup();
-    render(<FormSegmentRenderer content={mockContent} />);
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     const nameInput = screen.getByLabelText(/name/i);
     const emailInput = screen.getByLabelText(/email/i);
@@ -153,11 +159,12 @@ describe('FormSegmentRenderer', () => {
 
   it('shows loading state when submitting', async () => {
     const user = userEvent.setup();
+    const { submitForm } = await import('@/app/actions/form-submission');
 
     // Make submission take some time
-    vi.mocked(formSubmission.submitForm).mockImplementation(() => new Promise(resolve => setTimeout(() => resolve({ success: true }), 100)));
+    vi.mocked(submitForm).mockImplementation(() => new Promise(resolve => setTimeout(() => resolve({ success: true }), 100)));
 
-    render(<FormSegmentRenderer content={mockContent} />);
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     const nameInput = screen.getByLabelText(/name/i);
     const emailInput = screen.getByLabelText(/email/i);
@@ -173,7 +180,7 @@ describe('FormSegmentRenderer', () => {
 
   it('displays success message after successful submission', async () => {
     const user = userEvent.setup();
-    render(<FormSegmentRenderer content={mockContent} />);
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     const nameInput = screen.getByLabelText(/name/i);
     const emailInput = screen.getByLabelText(/email/i);
@@ -190,9 +197,10 @@ describe('FormSegmentRenderer', () => {
 
   it('displays error message on submission failure', async () => {
     const user = userEvent.setup();
-    vi.mocked(formSubmission.submitForm).mockResolvedValue({ success: false, error: 'Something went wrong' });
+    const { submitForm } = await import('@/app/actions/form-submission');
+    vi.mocked(submitForm).mockResolvedValue({ success: false, error: 'Something went wrong' });
 
-    render(<FormSegmentRenderer content={mockContent} />);
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     const nameInput = screen.getByLabelText(/name/i);
     const emailInput = screen.getByLabelText(/email/i);
@@ -214,14 +222,15 @@ describe('FormSegmentRenderer', () => {
       recipientEmail: '',
     };
 
-    render(<FormSegmentRenderer content={emptyContent} />);
+    renderWithToast(<FormSegmentRenderer content={emptyContent} />);
 
     expect(screen.getByText(/no form fields/i)).toBeInTheDocument();
   });
 
   it('validates required fields before submission', async () => {
     const user = userEvent.setup();
-    render(<FormSegmentRenderer content={mockContent} />);
+    const { submitForm } = await import('@/app/actions/form-submission');
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     const submitButton = screen.getByRole('button', { name: /submit/i });
 
@@ -229,12 +238,12 @@ describe('FormSegmentRenderer', () => {
     await user.click(submitButton);
 
     // Form should not submit (HTML5 validation will prevent it)
-    expect(formSubmission.submitForm).not.toHaveBeenCalled();
+    expect(submitForm).not.toHaveBeenCalled();
   });
 
   it('clears form after successful submission', async () => {
     const user = userEvent.setup();
-    render(<FormSegmentRenderer content={mockContent} />);
+    renderWithToast(<FormSegmentRenderer content={mockContent} />);
 
     const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
     const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement;
@@ -244,16 +253,12 @@ describe('FormSegmentRenderer', () => {
     await user.type(emailInput, 'john@example.com');
     await user.click(submitButton);
 
-    // After submission, success message should be shown
+    // After submission, success toast should be shown and form should be cleared
     await waitFor(() => {
       expect(screen.getByText('Thank you for your submission!')).toBeInTheDocument();
     });
 
-    // Click "Submit Another Response" to go back to the form
-    const submitAnotherButton = screen.getByRole('button', { name: /submit another response/i });
-    await user.click(submitAnotherButton);
-
-    // Form should be cleared
+    // Form should be automatically cleared
     await waitFor(() => {
       const clearedNameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
       const clearedEmailInput = screen.getByLabelText(/email/i) as HTMLInputElement;

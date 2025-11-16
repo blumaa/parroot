@@ -1,33 +1,12 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { Box, Heading, Text, Button } from "@mond-design-system/theme";
-import { Header } from "./components/Header";
-import { getMenuItems } from "./utils/firestore-navigation";
-import { getPages } from "./utils/firestore-pages";
-import { getUser } from "./lib/dal";
-import { getSiteSettings } from "./utils/firestore-settings";
 
 export default async function Home() {
   // Opt out of caching for this request
   noStore();
 
-  // Fetch navigation data, user, and settings for header
-  const [menuItems, pages, user, settings] = await Promise.all([
-    getMenuItems({ visible: true }),
-    getPages({ status: 'published' }),
-    getUser(),
-    getSiteSettings(),
-  ]);
-
   return (
-    <>
-      <Header
-        menuItems={menuItems}
-        pages={pages}
-        user={user}
-        siteName={settings?.siteName}
-        logoUrl={settings?.logoUrl}
-      />
-      <Box
+    <Box
         as="main"
         padding="20"
         display="flex"
@@ -54,6 +33,5 @@ export default async function Home() {
           </Box>
         </Box>
       </Box>
-    </>
   );
 }

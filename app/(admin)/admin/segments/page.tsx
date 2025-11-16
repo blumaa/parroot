@@ -1,5 +1,6 @@
 import { SegmentList } from '@/app/components/admin/SegmentList';
 import { getUser } from '@/app/lib/dal';
+import { getSegments } from '@/app/lib/data-access';
 import { redirect } from 'next/navigation';
 
 export default async function SegmentsPage() {
@@ -9,5 +10,7 @@ export default async function SegmentsPage() {
     redirect('/login');
   }
 
-  return <SegmentList />;
+  const segments = await getSegments();
+
+  return <SegmentList initialSegments={segments} />;
 }

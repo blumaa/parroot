@@ -102,14 +102,14 @@ export function GallerySegmentRenderer({
         >
           {validImages.map((image, index) => (
             <Box
+              as="button"
               key={image.id}
               display="flex"
               flexDirection="column"
               gap="sm"
-              style={{ cursor: "pointer" }}
               onClick={() => handleImageClick(index)}
             >
-              <Box
+              <div
                 style={{
                   position: "relative",
                   width: "100%",
@@ -129,7 +129,7 @@ export function GallerySegmentRenderer({
                     objectFit: "cover",
                   }}
                 />
-              </Box>
+              </div>
               {image.caption && (
                 <Text variant="body-sm" semantic="secondary">
                   {image.caption}

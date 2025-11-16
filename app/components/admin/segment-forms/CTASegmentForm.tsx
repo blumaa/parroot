@@ -118,7 +118,7 @@ export function CTASegmentForm({
       <Box display="flex" flexDirection="column" gap="md">
         <Heading level={4}>Primary Button Style</Heading>
 
-        <Box display="flex" gap="sm" style={{ flexWrap: "wrap" }}>
+        <Box display="flex" gap="sm" flexWrap="wrap">
           <Button
             type="button"
             size="sm"

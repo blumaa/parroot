@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Box, Text, Spinner } from '@mond-design-system/theme';
 import { PageForm } from './PageForm';
-import { getPageById, type Page } from '@/app/utils/firestore-pages';
+import type { Page } from '@/app/types';
+import { getPageByIdAction } from '@/app/actions/pages';
 
 interface EditPageWrapperProps {
   pageId: string;
@@ -19,7 +20,7 @@ export function EditPageWrapper({ pageId, userId }: EditPageWrapperProps) {
     const loadPage = async () => {
       try {
         setLoading(true);
-        const fetchedPage = await getPageById(pageId);
+        const fetchedPage = await getPageByIdAction(pageId);
 
         if (!fetchedPage) {
           setError('Page not found');

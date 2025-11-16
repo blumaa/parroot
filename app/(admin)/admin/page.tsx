@@ -1,24 +1,37 @@
-import { Box, Heading, Text } from '@mond-design-system/theme';
+import { unstable_noStore as noStore } from 'next/cache';
+import { getUser } from '@/app/lib/dal';
+import { redirect } from 'next/navigation';
+import { getSegments } from '@/app/lib/data-access';
+import { getAdminDb } from '@/app/lib/firebase-admin';
+import { DashboardView } from '@/app/components/admin/DashboardView';
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  noStore();
+
+  const user = await getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  // Check if there are any posts segments (draft OR published)
+  const allSegments = await getSegments();
+  const hasPostsSegments = allSegments.some(
+    (segment) => segment.type === 'posts'
+  );
+
+  // Check if there are any form submissions
+  const db = getAdminDb();
+  const submissionsSnapshot = await db
+    .collection('formSubmissions')
+    .limit(1)
+    .get();
+  const hasFormSubmissions = !submissionsSnapshot.empty;
+
   return (
-    <Box>
-      <Heading level={1}>Dashboard</Heading>
-      <Text variant="body">Welcome!</Text>
-      <Box marginTop="6" className="flex gap-4">
-        <Box>
-          <Heading level={3}>0</Heading>
-          <Text variant="body">Total Users</Text>
-        </Box>
-        <Box>
-          <Heading level={3}>0</Heading>
-          <Text variant="body">Total Pages</Text>
-        </Box>
-        <Box>
-          <Heading level={3}>0</Heading>
-          <Text variant="body">Total Posts</Text>
-        </Box>
-      </Box>
-    </Box>
+    <DashboardView
+      hasPostsSegments={hasPostsSegments}
+      hasFormSubmissions={hasFormSubmissions}
+    />
   );
 }

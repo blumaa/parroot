@@ -20,7 +20,6 @@ describe('AdminHeader', () => {
   const mockUser: UserData = {
     id: '123',
     email: 'admin@example.com',
-    role: 'admin',
     displayName: 'Admin User',
   };
 

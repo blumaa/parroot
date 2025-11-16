@@ -2,19 +2,22 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Box, Button, Text, Heading, Badge, Spinner } from '@mond-design-system/theme';
+import { Box, Button, Text, Heading, Badge, Spinner, Divider } from '@mond-design-system/theme';
 import { Input, Modal, ModalBody, ModalFooter } from '@mond-design-system/theme/client';
-import { getPages, deletePage, type Page } from '@/app/utils/firestore-pages';
+import type { Page } from '@/app/types';
+import { getPagesAction } from '@/app/actions/pages';
+import { deletePageAction } from '@/app/actions/pages';
 import { useToast } from '@/app/providers/ToastProvider';
 
 interface PageListProps {
   onDelete?: () => void;
+  initialPages?: Page[];
 }
 
-export function PageList({ onDelete }: PageListProps) {
-  const [pages, setPages] = useState<Page[]>([]);
-  const [filteredPages, setFilteredPages] = useState<Page[]>([]);
-  const [loading, setLoading] = useState(true);
+export function PageList({ onDelete, initialPages = [] }: PageListProps) {
+  const [pages, setPages] = useState<Page[]>(initialPages);
+  const [filteredPages, setFilteredPages] = useState<Page[]>(initialPages);
+  const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'published'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -23,7 +26,7 @@ export function PageList({ onDelete }: PageListProps) {
   const loadPages = useCallback(async () => {
     try {
       setLoading(true);
-      const fetchedPages = await getPages();
+      const fetchedPages = await getPagesAction();
       setPages(fetchedPages);
     } catch (error) {
       showError('Error', 'Failed to load pages');
@@ -53,9 +56,12 @@ export function PageList({ onDelete }: PageListProps) {
     setFilteredPages(filtered);
   }, [pages, statusFilter, searchQuery]);
 
+  // Only load pages if initialPages was empty
   useEffect(() => {
-    loadPages();
-  }, [loadPages]);
+    if (initialPages.length === 0) {
+      loadPages();
+    }
+  }, [initialPages.length, loadPages]);
 
   useEffect(() => {
     filterPages();
@@ -63,11 +69,16 @@ export function PageList({ onDelete }: PageListProps) {
 
   const handleDelete = async (id: string) => {
     try {
-      await deletePage(id);
-      showSuccess('Success', 'Page deleted successfully');
-      setDeleteConfirm(null);
-      await loadPages();
-      onDelete?.();
+      const result = await deletePageAction(id);
+      if (result.success) {
+        showSuccess('Success', 'Page deleted successfully');
+        setDeleteConfirm(null);
+        // Remove from local state
+        setPages(pages.filter(p => p.id !== id));
+        onDelete?.();
+      } else {
+        showError('Error', result.error || 'Failed to delete page');
+      }
     } catch (error) {
       showError('Error', 'Failed to delete page');
       console.error('Error deleting page:', error);
@@ -114,9 +125,13 @@ export function PageList({ onDelete }: PageListProps) {
             Draft ({pages.filter((p) => p.status === 'draft').length})
           </Button>
         </Box>
-        <Box flex="1">
+        <Divider orientation="vertical" />
+        <Box flex="1" display='flex' gap='sm' alignItems='center'>
+          <Text>
+            Search
+          </Text>
           <Input
-            label="Search"
+            // label="Search"
             type="text"
             placeholder="Search by title or slug..."
             value={searchQuery}
