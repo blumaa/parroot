@@ -41,7 +41,9 @@ export function AdminNavigation({
       gap="lg"
       border="default"
     >
-      <Heading level={2}>{siteName} Admin</Heading>
+      <Box display="flex" flexDirection="column" gap="md" alignItems="center">
+        <Heading level={2}>{siteName} Admin</Heading>
+      </Box>
       <Box display="flex" flexDirection="column" gap="sm">
         {navItems.map((item) => {
           const isActive = pathname === item.href;

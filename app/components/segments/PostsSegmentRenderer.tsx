@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Box,
   Text,
   Heading,
   Button,
-  Image,
   Link as MdsLink,
 } from "@mond-design-system/theme";
 import { Pagination } from "@mond-design-system/theme/client";
@@ -70,14 +70,15 @@ export function PostsSegmentRenderer({
                 <Box display="flex" gap="md">
                   {/* Featured Image */}
                   {post.featuredImage && (
-                    <Image
-                      src={post.featuredImage}
-                      alt={post.title}
-                      aspectRatio="1:1"
-                      borderRadius="lg"
-                      loading="eager"
-                      width="150px"
-                    />
+                    <Box corners="rounded">
+                      <Image
+                        src={post.featuredImage}
+                        alt={post.title}
+                        width={150}
+                        height={150}
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </Box>
                   )}
 
                   {/* Post Content */}

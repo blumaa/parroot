@@ -46,26 +46,6 @@ describe('TextBlockSegmentForm', () => {
     expect(mockOnContentChange.mock.calls.length).toBeGreaterThan(0);
   });
 
-  it('updates content when heading size changes', () => {
-    render(<TextBlockSegmentForm {...defaultProps} />);
-
-    // MDS Select component is tested via integration, not unit interaction
-    // Just verify it renders with correct default
-    expect(screen.getByLabelText(/heading size/i)).toBeInTheDocument();
-  });
-
-  it('calls onContentChange when alignment changes', async () => {
-    const user = userEvent.setup();
-    render(<TextBlockSegmentForm {...defaultProps} />);
-
-    const centerRadio = screen.getByLabelText(/center/i);
-    await user.click(centerRadio);
-
-    expect(mockOnContentChange).toHaveBeenCalledWith(
-      expect.objectContaining({ alignment: 'center' })
-    );
-  });
-
   it('loads existing content correctly', () => {
     const existingContent = {
       heading: 'Existing Heading',

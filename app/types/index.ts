@@ -5,15 +5,6 @@ export type MultiLang = {
   [languageCode: string]: string;
 };
 
-// User roles
-export type UserRole = 'admin' | 'editor';
-
-// Page status
-export type PageStatus = 'draft' | 'published' | 'archived';
-
-// Blog post status
-export type BlogPostStatus = 'draft' | 'published';
-
 // Post status
 export type PostStatus = 'draft' | 'published';
 
@@ -39,7 +30,7 @@ export type MenuItemType = 'page' | 'external' | 'dropdown';
 export interface User {
   id: string;
   email: string;
-  role: UserRole;
+  role: 'admin' | 'editor';
   displayName?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -138,85 +129,9 @@ export interface FormContent {
   recipientEmail: string;
 }
 
-export interface CarouselProps {
-  items: Array<{
-    id: string;
-    imageUrl: string;
-    caption?: MultiLang;
-  }>;
-}
-
-export interface GalleryProps {
-  images: Array<{
-    id: string;
-    url: string;
-    caption?: MultiLang;
-    alt: string;
-  }>;
-  columns: number;
-  gap: 'sm' | 'md' | 'lg';
-  lightbox: boolean;
-}
-
-export interface TextBlockProps {
-  content: MultiLang; // HTML content
-}
-
-export interface TitleProps {
-  text: MultiLang;
-  level: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-  alignment: 'left' | 'center' | 'right';
-  variant?: string;
-}
-
-export interface FormProps {
-  templateType: 'contact';
-}
-
-export interface PayPalDonateProps {
-  title: MultiLang;
-  description: MultiLang;
-  suggestedAmounts: number[];
-}
-
-export interface SocialLinksProps {
-  platforms: Array<{
-    type: 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok';
-    url: string;
-    label?: MultiLang;
-  }>;
-  displayStyle: 'icon' | 'iconLabel' | 'button';
-  iconSize: 'sm' | 'md' | 'lg';
-}
-
 export interface PostsSegmentProps {
   title: string;
   description: string;
-}
-
-// ============================================
-// BLOG POST
-// ============================================
-export interface BlogPost {
-  id: string;
-  title: MultiLang;
-  content: MultiLang; // Rich HTML content
-  excerpt: MultiLang;
-  slug: string;
-  category: string;
-  tags: string[];
-  featuredImage?: string;
-  author: string;
-  authorId: string;
-  publishDate: Timestamp;
-  status: BlogPostStatus;
-  metadata: {
-    metaTitle?: MultiLang;
-    metaDescription?: MultiLang;
-    ogImage?: string;
-  };
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
 }
 
 // ============================================
@@ -253,6 +168,8 @@ export interface MenuItem {
   id: string;
   pageId: string;
   label: string;
+  parentId?: string; // Optional: ID of parent menu item for nested menus
+  children?: MenuItem[]; // Computed field: nested children (not stored in DB)
   order: number;
   visible: boolean;
   variant: ButtonVariant;
@@ -261,48 +178,6 @@ export interface MenuItem {
   updatedAt: Date;
   createdBy: string;
   updatedBy: string;
-}
-
-// ============================================
-// BRAND CONFIGURATION
-// ============================================
-export interface BrandConfiguration {
-  id: string; // Singleton - typically 'default'
-  colors: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    [key: string]: string;
-  };
-  typography: {
-    fontFamily: string;
-    headingScale: number;
-    [key: string]: string | number;
-  };
-  spacing: {
-    baseUnit: number;
-    [key: string]: number;
-  };
-  logo?: string;
-  favicon?: string;
-  updatedAt: Timestamp;
-}
-
-// ============================================
-// MEDIA
-// ============================================
-export interface Media {
-  id: string;
-  url: string;
-  filename: string;
-  contentType: string;
-  size: number;
-  uploadedBy: string;
-  uploadedAt: Timestamp;
-  metadata?: {
-    alt?: MultiLang;
-    caption?: MultiLang;
-  };
 }
 
 // ============================================

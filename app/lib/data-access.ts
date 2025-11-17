@@ -228,12 +228,13 @@ export async function getMenuItems(filters?: { visible?: boolean }): Promise<Men
 
   const snapshot = await query.get();
 
-  return snapshot.docs.map(doc => {
+  const allItems = snapshot.docs.map(doc => {
     const data = doc.data();
     return {
       id: doc.id,
       pageId: data.pageId,
       label: data.label,
+      parentId: data.parentId || undefined,
       order: data.order,
       visible: data.visible ?? true,
       variant: data.variant || 'ghost',
@@ -244,6 +245,41 @@ export async function getMenuItems(filters?: { visible?: boolean }): Promise<Men
       updatedBy: data.updatedBy,
     } as MenuItem;
   });
+
+  // Build hierarchical structure: only return top-level items with children populated
+  const itemMap = new Map<string, MenuItem>();
+  const topLevelItems: MenuItem[] = [];
+
+  // First pass: create map of all items
+  allItems.forEach(item => {
+    itemMap.set(item.id, { ...item, children: [] });
+  });
+
+  // Second pass: build hierarchy
+  allItems.forEach(item => {
+    const menuItem = itemMap.get(item.id)!;
+
+    if (item.parentId) {
+      // This is a child item, add it to its parent's children array
+      const parent = itemMap.get(item.parentId);
+      if (parent) {
+        parent.children = parent.children || [];
+        parent.children.push(menuItem);
+      }
+    } else {
+      // This is a top-level item
+      topLevelItems.push(menuItem);
+    }
+  });
+
+  // Sort children arrays by order
+  topLevelItems.forEach(item => {
+    if (item.children && item.children.length > 0) {
+      item.children.sort((a, b) => a.order - b.order);
+    }
+  });
+
+  return topLevelItems;
 }
 
 // ============================================================================

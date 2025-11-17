@@ -3,22 +3,6 @@ import { render, screen } from '@testing-library/react';
 import { AdminNavigation } from '../AdminNavigation';
 import React from 'react';
 
-// Mock MDS components
-vi.mock('@mond-design-system/theme', () => ({
-  Box: ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
-  Button: ({ children, as, href, variant, ...props }: React.ComponentProps<'button'> & { as?: React.ElementType; href?: string; variant?: string }) => {
-    if (as) {
-      const Component = as;
-      return <Component href={href} data-variant={variant} {...props}>{children}</Component>;
-    }
-    return <button data-variant={variant} {...props}>{children}</button>;
-  },
-  Heading: ({ children, level = '1', ...props }: React.ComponentProps<'h1'> & { level?: string }) => {
-    const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-    return React.createElement(Tag, props, children);
-  },
-}));
-
 // Mock next/link
 vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: React.ComponentProps<'a'> & { href: string }) => (
@@ -39,14 +23,14 @@ describe('AdminNavigation', () => {
 
   it('renders the navigation with site name', () => {
     mockPathname.mockReturnValue('/admin');
-    render(<AdminNavigation />);
+    render(<AdminNavigation hasPostsSegments={false} hasFormSubmissions={false} />);
 
     expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument();
   });
 
   it('renders navigation items for Dashboard and Settings', () => {
     mockPathname.mockReturnValue('/admin');
-    render(<AdminNavigation />);
+    render(<AdminNavigation hasPostsSegments={false} hasFormSubmissions={false} />);
 
     expect(screen.getByRole('link', { name: /dashboard/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /settings/i })).toBeInTheDocument();
@@ -54,7 +38,7 @@ describe('AdminNavigation', () => {
 
   it('highlights Dashboard as active when on /admin route', () => {
     mockPathname.mockReturnValue('/admin');
-    render(<AdminNavigation />);
+    render(<AdminNavigation hasPostsSegments={false} hasFormSubmissions={false} />);
 
     const dashboardButton = screen.getByRole('button', { name: /dashboard/i });
     const settingsButton = screen.getByRole('button', { name: /settings/i });
@@ -65,7 +49,7 @@ describe('AdminNavigation', () => {
 
   it('highlights Settings as active when on /admin/settings route', () => {
     mockPathname.mockReturnValue('/admin/settings');
-    render(<AdminNavigation />);
+    render(<AdminNavigation hasPostsSegments={false} hasFormSubmissions={false} />);
 
     const dashboardButton = screen.getByRole('button', { name: /dashboard/i });
     const settingsButton = screen.getByRole('button', { name: /settings/i });
@@ -76,7 +60,7 @@ describe('AdminNavigation', () => {
 
   it('links to correct routes', () => {
     mockPathname.mockReturnValue('/admin');
-    render(<AdminNavigation />);
+    render(<AdminNavigation hasPostsSegments={false} hasFormSubmissions={false} />);
 
     const dashboardLink = screen.getByRole('link', { name: /dashboard/i });
     const settingsLink = screen.getByRole('link', { name: /settings/i });

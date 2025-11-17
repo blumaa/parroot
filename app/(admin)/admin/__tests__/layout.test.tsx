@@ -3,11 +3,6 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import AdminLayout from '../layout';
 
-// Mock MDS components
-vi.mock('@mond-design-system/theme', () => ({
-  Box: ({ children, ...props }: React.ComponentProps<'div'>) => <div data-testid="mds-box" {...props}>{children}</div>,
-}));
-
 // Mock admin components
 vi.mock('@/app/components/admin/AdminHeader', () => ({
   AdminHeader: ({ user }: { user: { email: string } }) => <div data-testid="admin-header">{user.email}</div>,
@@ -22,7 +17,18 @@ vi.mock('@/app/lib/dal', () => ({
   getUser: vi.fn(),
 }));
 
-// Mock getSiteSettings
+// Mock Firebase Admin
+vi.mock('@/app/lib/firebase-admin', () => ({
+  getAdminDb: vi.fn(() => ({
+    collection: vi.fn(() => ({
+      limit: vi.fn(() => ({
+        get: vi.fn().mockResolvedValue({ empty: true }),
+      })),
+    })),
+  })),
+}));
+
+// Mock data access functions
 vi.mock('@/app/lib/data-access', () => ({
   getSiteSettings: vi.fn().mockResolvedValue({
     id: 'default',
@@ -38,6 +44,8 @@ vi.mock('@/app/lib/data-access', () => ({
     createdBy: 'test',
     updatedBy: 'test',
   }),
+  getSegments: vi.fn().mockResolvedValue([]),
+  getFormSubmissions: vi.fn().mockResolvedValue([]),
 }));
 
 // Mock Next.js redirect

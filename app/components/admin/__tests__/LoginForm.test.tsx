@@ -5,21 +5,6 @@ import React from 'react';
 import { LoginForm } from '../LoginForm';
 import { createSessionFromCredentials } from '@/app/actions/auth';
 
-// Mock MDS components
-vi.mock('@mond-design-system/theme', () => ({
-  Box: ({ children, as = 'div', onSubmit, ...props }: React.ComponentProps<'div'> & { as?: React.ElementType; onSubmit?: React.FormEventHandler }) => {
-    const Component = as;
-    return <Component onSubmit={onSubmit} {...props}>{children}</Component>;
-  },
-  Button: ({ children, ...props }: React.ComponentProps<'button'>) => <button {...props}>{children}</button>,
-  Input: ({ label, ...props }: React.ComponentProps<'input'> & { label: string }) => (
-    <div>
-      <label htmlFor={props.id || label}>{label}</label>
-      <input id={props.id || label} aria-label={label} {...props} />
-    </div>
-  ),
-}));
-
 // Mock the auth utility
 vi.mock('@/app/utils/auth', () => ({
   signInUser: vi.fn(),

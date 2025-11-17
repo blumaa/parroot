@@ -15,7 +15,23 @@ export async function deleteMenuItemAction(menuItemId: string) {
 
   try {
     const db = getAdminDb();
-    await db.collection('navigation').doc(menuItemId).delete();
+
+    // First, find and delete all children of this menu item
+    const childrenSnapshot = await db.collection('navigation')
+      .where('parentId', '==', menuItemId)
+      .get();
+
+    const batch = db.batch();
+
+    // Delete children
+    childrenSnapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    // Delete the parent item
+    batch.delete(db.collection('navigation').doc(menuItemId));
+
+    await batch.commit();
 
     revalidatePath('/admin/navigation');
     revalidatePath('/');
@@ -34,6 +50,7 @@ export async function createMenuItemAction(data: {
   order: number;
   variant?: string;
   size?: string;
+  parentId?: string;
 }) {
   const { userId } = await verifySession();
 
@@ -70,6 +87,7 @@ export async function updateMenuItemAction(
     order: number;
     variant?: string;
     size?: string;
+    parentId?: string;
   }>
 ) {
   const { userId } = await verifySession();

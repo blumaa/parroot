@@ -15,5 +15,5 @@ export default async function NavigationPage() {
     getPages()
   ]);
 
-  return <NavigationManager userId={session.userId} initialMenuItems={menuItems} initialPages={pages} />;
+  return <NavigationManager initialMenuItems={menuItems} initialPages={pages} />;
 }

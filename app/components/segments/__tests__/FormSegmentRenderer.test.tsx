@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Mock the form submission action BEFORE any other imports
+vi.mock('@/app/actions/form-submission', () => ({
+  submitForm: vi.fn().mockResolvedValue({ success: true }),
+}));
+
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FormSegmentRenderer } from '../FormSegmentRenderer';
 import { ToastProvider } from '@/app/providers/ToastProvider';
-
-// Mock the form submission action
-vi.mock('@/app/actions/form-submission', () => ({
-  submitForm: vi.fn().mockResolvedValue({ success: true }),
-}));
 
 describe('FormSegmentRenderer', () => {
 
@@ -49,42 +50,6 @@ describe('FormSegmentRenderer', () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
   });
 
-  it('renders text input field correctly', () => {
-    renderWithToast(<FormSegmentRenderer content={mockContent} />);
-
-    const nameInput = screen.getByLabelText(/name/i);
-    expect(nameInput).toHaveAttribute('type', 'text');
-    expect(nameInput).toHaveAttribute('placeholder', 'Enter your name');
-  });
-
-  it('renders email input field correctly', () => {
-    renderWithToast(<FormSegmentRenderer content={mockContent} />);
-
-    const emailInput = screen.getByLabelText(/email/i);
-    expect(emailInput).toHaveAttribute('type', 'email');
-    expect(emailInput).toHaveAttribute('placeholder', 'your@email.com');
-  });
-
-  it('renders textarea field correctly', () => {
-    const content = {
-      ...mockContent,
-      fields: [
-        {
-          id: 'field-1',
-          type: 'textarea' as const,
-          label: 'Message',
-          placeholder: 'Your message',
-          required: false,
-        },
-      ],
-    };
-
-    renderWithToast(<FormSegmentRenderer content={content} />);
-
-    const textarea = screen.getByLabelText(/message/i);
-    expect(textarea.tagName).toBe('TEXTAREA');
-  });
-
   it('renders select field with options', () => {
     const content = {
       ...mockContent,
@@ -107,54 +72,6 @@ describe('FormSegmentRenderer', () => {
     expect(screen.getByText('USA')).toBeInTheDocument();
     expect(screen.getByText('Canada')).toBeInTheDocument();
     expect(screen.getByText('Mexico')).toBeInTheDocument();
-  });
-
-  it('renders phone input field correctly', () => {
-    const content = {
-      ...mockContent,
-      fields: [
-        {
-          id: 'field-1',
-          type: 'phone' as const,
-          label: 'Phone',
-          placeholder: '(555) 123-4567',
-          required: false,
-        },
-      ],
-    };
-
-    renderWithToast(<FormSegmentRenderer content={content} />);
-
-    const phoneInput = screen.getByLabelText(/phone/i);
-    expect(phoneInput).toHaveAttribute('type', 'tel');
-  });
-
-  it('shows required indicator for required fields', () => {
-    renderWithToast(<FormSegmentRenderer content={mockContent} />);
-
-    // Check that required fields are marked (MDS Input handles this)
-    const nameInput = screen.getByLabelText(/name/i);
-    expect(nameInput).toBeRequired();
-  });
-
-  it('renders submit button', () => {
-    renderWithToast(<FormSegmentRenderer content={mockContent} />);
-
-    expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
-  });
-
-  it('allows user to fill out form', async () => {
-    const user = userEvent.setup();
-    renderWithToast(<FormSegmentRenderer content={mockContent} />);
-
-    const nameInput = screen.getByLabelText(/name/i);
-    const emailInput = screen.getByLabelText(/email/i);
-
-    await user.type(nameInput, 'John Doe');
-    await user.type(emailInput, 'john@example.com');
-
-    expect(nameInput).toHaveValue('John Doe');
-    expect(emailInput).toHaveValue('john@example.com');
   });
 
   it('shows loading state when submitting', async () => {

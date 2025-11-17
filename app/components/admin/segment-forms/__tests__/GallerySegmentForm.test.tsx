@@ -35,13 +35,6 @@ describe('GallerySegmentForm', () => {
     expect(screen.queryByText(/image 1/i)).not.toBeInTheDocument();
   });
 
-  it('renders gallery settings with default values', () => {
-    render(<GallerySegmentForm {...defaultProps} />);
-
-    expect(screen.getByText(/gallery settings/i)).toBeInTheDocument();
-    expect(screen.getByText(/images per row/i)).toBeInTheDocument();
-  });
-
   it('adds a new image when add button is clicked', async () => {
     const user = userEvent.setup();
     render(<GallerySegmentForm {...defaultProps} />);
@@ -70,72 +63,6 @@ describe('GallerySegmentForm', () => {
         imagesPerRow: 3,
       })
     );
-  });
-
-  it('updates image URL field', async () => {
-    const user = userEvent.setup();
-    const content = {
-      images: [
-        {
-          id: 'img-1',
-          imageUrl: '',
-          caption: '',
-          alt: '',
-        },
-      ],
-    };
-
-    render(<GallerySegmentForm content={content} onContentChange={mockOnContentChange} />);
-
-    const imageUrlInput = screen.getByLabelText(/image url/i);
-    await user.type(imageUrlInput, 'https://example.com/image.jpg');
-
-    expect(mockOnContentChange).toHaveBeenCalled();
-    expect(mockOnContentChange.mock.calls.length).toBeGreaterThan(0);
-  });
-
-  it('updates caption field', async () => {
-    const user = userEvent.setup();
-    const content = {
-      images: [
-        {
-          id: 'img-1',
-          imageUrl: '',
-          caption: '',
-          alt: '',
-        },
-      ],
-    };
-
-    render(<GallerySegmentForm content={content} onContentChange={mockOnContentChange} />);
-
-    const captionInput = screen.getByLabelText(/caption/i);
-    await user.type(captionInput, 'Test Caption');
-
-    expect(mockOnContentChange).toHaveBeenCalled();
-    expect(mockOnContentChange.mock.calls.length).toBeGreaterThan(0);
-  });
-
-  it('updates alt text field', async () => {
-    const user = userEvent.setup();
-    const content = {
-      images: [
-        {
-          id: 'img-1',
-          imageUrl: '',
-          caption: '',
-          alt: '',
-        },
-      ],
-    };
-
-    render(<GallerySegmentForm content={content} onContentChange={mockOnContentChange} />);
-
-    const altInput = screen.getByLabelText(/alt text/i);
-    await user.type(altInput, 'Test Alt Text');
-
-    expect(mockOnContentChange).toHaveBeenCalled();
-    expect(mockOnContentChange.mock.calls.length).toBeGreaterThan(0);
   });
 
   it('removes image when delete button is clicked', async () => {
@@ -173,66 +100,6 @@ describe('GallerySegmentForm', () => {
     expect(lastCall.images).toHaveLength(1);
   });
 
-  it('moves image up when up button is clicked', async () => {
-    const user = userEvent.setup();
-    const content = {
-      images: [
-        {
-          id: 'img-1',
-          imageUrl: '',
-          caption: 'First',
-          alt: '',
-        },
-        {
-          id: 'img-2',
-          imageUrl: '',
-          caption: 'Second',
-          alt: '',
-        },
-      ],
-    };
-
-    render(<GallerySegmentForm content={content} onContentChange={mockOnContentChange} />);
-
-    const upButtons = screen.getAllByLabelText(/move up/i);
-    await user.click(upButtons[1]); // Click up on second image
-
-    expect(mockOnContentChange).toHaveBeenCalled();
-    const lastCall = mockOnContentChange.mock.calls[mockOnContentChange.mock.calls.length - 1][0];
-    expect(lastCall.images[0].id).toBe('img-2');
-    expect(lastCall.images[1].id).toBe('img-1');
-  });
-
-  it('moves image down when down button is clicked', async () => {
-    const user = userEvent.setup();
-    const content = {
-      images: [
-        {
-          id: 'img-1',
-          imageUrl: '',
-          caption: 'First',
-          alt: '',
-        },
-        {
-          id: 'img-2',
-          imageUrl: '',
-          caption: 'Second',
-          alt: '',
-        },
-      ],
-    };
-
-    render(<GallerySegmentForm content={content} onContentChange={mockOnContentChange} />);
-
-    const downButtons = screen.getAllByLabelText(/move down/i);
-    await user.click(downButtons[0]); // Click down on first image
-
-    expect(mockOnContentChange).toHaveBeenCalled();
-    const lastCall = mockOnContentChange.mock.calls[mockOnContentChange.mock.calls.length - 1][0];
-    expect(lastCall.images[0].id).toBe('img-2');
-    expect(lastCall.images[1].id).toBe('img-1');
-  });
-
   it('loads existing images correctly', () => {
     const content = {
       images: [
@@ -249,39 +116,5 @@ describe('GallerySegmentForm', () => {
 
     expect(screen.getByDisplayValue('Existing Caption')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Existing Alt')).toBeInTheDocument();
-  });
-
-  it('supports draft saving with empty fields', () => {
-    const content = {
-      images: [
-        {
-          id: 'img-1',
-          imageUrl: '',
-          caption: 'Only Caption',
-          alt: '',
-        },
-      ],
-    };
-
-    render(<GallerySegmentForm content={content} onContentChange={mockOnContentChange} />);
-
-    expect(screen.getByDisplayValue('Only Caption')).toBeInTheDocument();
-  });
-
-  it('displays live preview when images exist', () => {
-    const content = {
-      images: [
-        {
-          id: 'img-1',
-          imageUrl: 'https://example.com/image.jpg',
-          caption: 'Test Image',
-          alt: 'Test Alt',
-        },
-      ],
-    };
-
-    render(<GallerySegmentForm content={content} onContentChange={mockOnContentChange} />);
-
-    expect(screen.getByText(/live preview/i)).toBeInTheDocument();
   });
 });

@@ -23,17 +23,17 @@ const SIZE_OPTIONS: Array<{ value: ButtonSize; label: string }> = [
 ];
 
 interface NavigationManagerProps {
-  userId: string;
   initialMenuItems?: MenuItem[];
   initialPages?: Page[];
 }
 
-export function NavigationManager({ userId, initialMenuItems = [], initialPages = [] }: NavigationManagerProps) {
+export function NavigationManager({ initialMenuItems = [], initialPages = [] }: NavigationManagerProps) {
   const { showSuccess, showError } = useToast();
   const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems);
   const [availablePages, setAvailablePages] = useState<Page[]>(initialPages);
   const [loading, setLoading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [addingSubmenuTo, setAddingSubmenuTo] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -60,12 +60,22 @@ export function NavigationManager({ userId, initialMenuItems = [], initialPages 
     }
   }, [initialMenuItems.length, initialPages.length, loadData]);
 
-  const handleAddPage = async (pageId: string) => {
+  const handleAddPage = async (pageId: string, parentId?: string) => {
     try {
       const page = availablePages.find((p) => p.id === pageId);
       if (!page) return;
 
-      const maxOrder = menuItems.length > 0 ? Math.max(...menuItems.map((m) => m.order)) : -1;
+      // Calculate order: if parentId exists, find max order among siblings
+      let maxOrder = -1;
+      if (parentId) {
+        const parent = menuItems.find(item => item.id === parentId);
+        if (parent && parent.children && parent.children.length > 0) {
+          maxOrder = Math.max(...parent.children.map((m) => m.order));
+        }
+      } else {
+        // Top-level item
+        maxOrder = menuItems.length > 0 ? Math.max(...menuItems.map((m) => m.order)) : -1;
+      }
 
       const result = await createMenuItemAction({
         pageId: page.id,
@@ -74,10 +84,11 @@ export function NavigationManager({ userId, initialMenuItems = [], initialPages 
         visible: true,
         variant: 'ghost',
         size: 'md',
+        parentId,
       });
 
       if (result.success) {
-        showSuccess('Success', 'Page added to navigation');
+        showSuccess('Success', `Page added to ${parentId ? 'submenu' : 'navigation'}`);
         await loadData();
       } else {
         showError('Error', result.error || 'Failed to add page to navigation');
@@ -217,8 +228,140 @@ export function NavigationManager({ userId, initialMenuItems = [], initialPages 
     );
   }
 
-  const pagesInMenu = new Set(menuItems.map((item) => item.pageId));
+  // Helper function to get all pageIds used in menu (including children)
+  const getAllUsedPageIds = (items: MenuItem[]): Set<string> => {
+    const usedIds = new Set<string>();
+    const addIds = (menuItems: MenuItem[]) => {
+      menuItems.forEach(item => {
+        usedIds.add(item.pageId);
+        if (item.children && item.children.length > 0) {
+          addIds(item.children);
+        }
+      });
+    };
+    addIds(items);
+    return usedIds;
+  };
+
+  const pagesInMenu = getAllUsedPageIds(menuItems);
   const availablePagesToAdd = availablePages.filter((page) => !pagesInMenu.has(page.id));
+
+  // Recursive component to render menu items with nested children
+  const renderMenuItem = (item: MenuItem, index: number, siblings: MenuItem[], depth: number = 0) => {
+    const page = availablePages.find((p) => p.id === item.pageId);
+    const hasChildren = item.children && item.children.length > 0;
+    const indentClass = depth > 0 ? `ml-${depth * 8}` : '';
+
+    return (
+      <Box key={item.id} display="flex" flexDirection="column" gap="sm">
+        <Box
+          display="flex"
+          alignItems="center"
+          gap="md"
+          padding="4"
+          className={`border rounded ${indentClass}`}
+        >
+          {/* Order & Label */}
+          <Box flex="1" display="flex" alignItems="center" gap="sm">
+            <Box className="min-w-[30px]">
+              <Text variant="body-sm" semantic="secondary">
+                {depth > 0 ? '└' : ''} {index + 1}.
+              </Text>
+            </Box>
+            <Box display="flex" flexDirection="column">
+              <Text variant="body">{item.label}</Text>
+              <Text variant="body-sm" semantic="secondary">
+                /{page?.slug || 'unknown'}
+              </Text>
+            </Box>
+          </Box>
+
+          {/* Variant Select */}
+          <Box className="w-40">
+            <Select
+              value={item.variant}
+              onChange={(value) => handleVariantChange(item.id, value as ButtonVariant)}
+              options={VARIANT_OPTIONS}
+            />
+          </Box>
+
+          {/* Size Select */}
+          <Box className="w-32">
+            <Select
+              value={item.size}
+              onChange={(value) => handleSizeChange(item.id, value as ButtonSize)}
+              options={SIZE_OPTIONS}
+            />
+          </Box>
+
+          {/* Visibility Toggle */}
+          <Button
+            type="button"
+            variant={item.visible ? 'outline' : 'ghost'}
+            size="sm"
+            onClick={() => handleVisibilityToggle(item.id, !item.visible)}
+          >
+            {item.visible ? 'Visible' : 'Hidden'}
+          </Button>
+
+          {/* Add Submenu (only for top-level items) */}
+          {depth === 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setAddingSubmenuTo(item.id)}
+            >
+              + Submenu
+            </Button>
+          )}
+
+          {/* Reorder Buttons */}
+          <Box display="flex" gap="sm">
+            {index > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => handleMoveUp(index)}
+              >
+                ↑
+              </Button>
+            )}
+            {index < siblings.length - 1 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => handleMoveDown(index)}
+              >
+                ↓
+              </Button>
+            )}
+          </Box>
+
+          {/* Delete */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setDeleteConfirm(item.id)}
+          >
+            Remove
+          </Button>
+        </Box>
+
+        {/* Render children */}
+        {hasChildren && (
+          <Box display="flex" flexDirection="column" gap="sm" paddingLeft="8">
+            {item.children!.map((child, childIndex) =>
+              renderMenuItem(child, childIndex, item.children!, depth + 1)
+            )}
+          </Box>
+        )}
+      </Box>
+    );
+  };
 
   return (
     <Box padding="4" display="flex" flexDirection="column" gap="lg">
@@ -242,96 +385,7 @@ export function NavigationManager({ userId, initialMenuItems = [], initialPages 
           </Box>
         ) : (
           <Box display="flex" flexDirection="column" gap="sm">
-            {menuItems.map((item, index) => {
-              const page = availablePages.find((p) => p.id === item.pageId);
-              return (
-                <Box
-                  key={item.id}
-                  display="flex"
-                  alignItems="center"
-                  gap="md"
-                  padding="4"
-                  className="border rounded"
-                >
-                  {/* Order & Label */}
-                  <Box flex="1" display="flex" alignItems="center" gap="sm">
-                    <Box className="min-w-[30px]">
-                      <Text variant="body-sm" semantic="secondary">
-                        {index + 1}.
-                      </Text>
-                    </Box>
-                    <Box display="flex" flexDirection="column">
-                      <Text variant="body">{item.label}</Text>
-                      <Text variant="body-sm" semantic="secondary">
-                        /{page?.slug || 'unknown'}
-                      </Text>
-                    </Box>
-                  </Box>
-
-                  {/* Variant Select */}
-                  <Box className="w-40">
-                    <Select
-                      value={item.variant}
-                      onChange={(value) => handleVariantChange(item.id, value as ButtonVariant)}
-                      options={VARIANT_OPTIONS}
-                    />
-                  </Box>
-
-                  {/* Size Select */}
-                  <Box className="w-32">
-                    <Select
-                      value={item.size}
-                      onChange={(value) => handleSizeChange(item.id, value as ButtonSize)}
-                      options={SIZE_OPTIONS}
-                    />
-                  </Box>
-
-                  {/* Visibility Toggle */}
-                  <Button
-                    type="button"
-                    variant={item.visible ? 'outline' : 'ghost'}
-                    size="sm"
-                    onClick={() => handleVisibilityToggle(item.id, !item.visible)}
-                  >
-                    {item.visible ? 'Visible' : 'Hidden'}
-                  </Button>
-
-                  {/* Reorder Buttons */}
-                  <Box display="flex" gap="sm">
-                    {index > 0 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleMoveUp(index)}
-                      >
-                        ↑
-                      </Button>
-                    )}
-                    {index < menuItems.length - 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleMoveDown(index)}
-                      >
-                        ↓
-                      </Button>
-                    )}
-                  </Box>
-
-                  {/* Delete */}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setDeleteConfirm(item.id)}
-                  >
-                    Remove
-                  </Button>
-                </Box>
-              );
-            })}
+            {menuItems.map((item, index) => renderMenuItem(item, index, menuItems, 0))}
           </Box>
         )}
       </Box>
@@ -397,6 +451,65 @@ export function NavigationManager({ userId, initialMenuItems = [], initialPages 
               onClick={() => deleteConfirm && handleRemove(deleteConfirm)}
             >
               Remove
+            </Button>
+          </Box>
+        </ModalFooter>
+      </Modal>
+
+      {/* Add Submenu Modal */}
+      <Modal
+        isOpen={addingSubmenuTo !== null}
+        onClose={() => setAddingSubmenuTo(null)}
+        title="Add Submenu Item"
+        size="md"
+      >
+        <ModalBody>
+          <Box display="flex" flexDirection="column" gap="md">
+            <Text variant="body">Select a page to add as a submenu item:</Text>
+            {availablePagesToAdd.length === 0 ? (
+              <Text variant="body-sm" semantic="secondary">
+                All published pages are already in the menu.
+              </Text>
+            ) : (
+              <Box display="flex" flexDirection="column" gap="sm">
+                {availablePagesToAdd.map((page) => (
+                  <Box
+                    key={page.id}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    padding="3"
+                    className="border rounded"
+                  >
+                    <Box display="flex" flexDirection="column">
+                      <Text variant="body">{page.title}</Text>
+                      <Text variant="body-sm" semantic="secondary">
+                        /{page.slug}
+                      </Text>
+                    </Box>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (addingSubmenuTo) {
+                          handleAddPage(page.id, addingSubmenuTo);
+                          setAddingSubmenuTo(null);
+                        }
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+        </ModalBody>
+        <ModalFooter>
+          <Box display="flex" gap="sm" justifyContent="flex-end">
+            <Button variant="outline" onClick={() => setAddingSubmenuTo(null)}>
+              Cancel
             </Button>
           </Box>
         </ModalFooter>

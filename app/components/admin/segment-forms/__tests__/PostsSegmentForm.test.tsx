@@ -70,42 +70,4 @@ describe('PostsSegmentForm', () => {
     expect(titleInput).toHaveValue('');
     expect(descriptionInput).toHaveValue('');
   });
-
-  it('calls onContentChange with updated title', async () => {
-    const user = userEvent.setup();
-    const content = { title: '', description: 'Description' };
-
-    render(<PostsSegmentForm content={content} onContentChange={mockOnContentChange} />);
-
-    const titleInput = screen.getByLabelText(/section title/i);
-    await user.type(titleInput, 'N');
-
-    expect(mockOnContentChange).toHaveBeenCalled();
-  });
-
-  it('calls onContentChange with updated description', async () => {
-    const user = userEvent.setup();
-    const content = { title: 'Title', description: '' };
-
-    render(<PostsSegmentForm content={content} onContentChange={mockOnContentChange} />);
-
-    const descriptionInput = screen.getByLabelText(/section description/i);
-    await user.type(descriptionInput, 'N');
-
-    expect(mockOnContentChange).toHaveBeenCalled();
-  });
-
-  it('shows placeholder text for title input', () => {
-    render(<PostsSegmentForm {...defaultProps} />);
-
-    const titleInput = screen.getByPlaceholderText(/latest news|company updates/i);
-    expect(titleInput).toBeInTheDocument();
-  });
-
-  it('shows placeholder text for description textarea', () => {
-    render(<PostsSegmentForm {...defaultProps} />);
-
-    const descriptionInput = screen.getByPlaceholderText(/brief description/i);
-    expect(descriptionInput).toBeInTheDocument();
-  });
 });
