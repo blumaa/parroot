@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Box, Button, Heading } from "@mond-design-system/theme";
+import { Box, Button, Heading, Icon } from "@mond-design-system/theme";
 import {
   Avatar,
   Popover,
@@ -10,7 +10,7 @@ import {
   DrawerHeader,
   DrawerBody,
 } from "@mond-design-system/theme/client";
-import type { MenuItem, Page } from "@/app/types";
+import type { MenuItem, Page, HeadingSize, AvatarSize } from "@/app/types";
 import { HeaderAdminArea } from "./HeaderAdminArea";
 import "./header.css";
 
@@ -20,7 +20,9 @@ interface HeaderProps {
   user: { id: string; email: string } | null;
   siteName?: string;
   logoUrl?: string;
+  logoSize?: AvatarSize;
   stickyHeader?: boolean;
+  siteNameSize?: HeadingSize;
 }
 
 export function Header({
@@ -29,7 +31,9 @@ export function Header({
   user,
   siteName = "Parroot",
   logoUrl,
+  logoSize = "2xl",
   stickyHeader = false,
+  siteNameSize = "md",
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
@@ -191,10 +195,10 @@ export function Header({
                   src={logoUrl}
                   alt={siteName}
                   fallback={siteName}
-                  size="lg"
+                  size={logoSize}
                 />
               )}
-              <Heading level={3}>{siteName}</Heading>
+              <Heading level={3} size={siteNameSize}>{siteName}</Heading>
             </Box>
           </Link>
 
@@ -215,10 +219,43 @@ export function Header({
           <Box className="mobile-nav">
             <Button
               variant="outline"
-              size="sm"
               onClick={() => setMobileMenuOpen(true)}
+              iconOnly
             >
-              ☰
+              <Icon color="currentColor">
+                <svg
+                  width="100%"
+                  viewBox="0 0 48 48"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect
+                    width="48"
+                    height="48"
+                    fillOpacity="0.01"
+                  />
+                  <path
+                    d="M7.94977 11.9498H39.9498"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M7.94977 23.9498H39.9498"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M7.94977 35.9498H39.9498"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Icon>
             </Button>
           </Box>
         </Box>

@@ -31,7 +31,7 @@ export function GallerySegmentForm({
 
     onContentChange({
       ...content,
-      images: [...images, newImage],
+      images: [newImage, ...images],
     });
   };
 
@@ -46,7 +46,10 @@ export function GallerySegmentForm({
     if (index === 0) return;
 
     const newImages = [...images];
-    [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+    [newImages[index - 1], newImages[index]] = [
+      newImages[index],
+      newImages[index - 1],
+    ];
 
     onContentChange({
       ...content,
@@ -58,7 +61,10 @@ export function GallerySegmentForm({
     if (index === images.length - 1) return;
 
     const newImages = [...images];
-    [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
+    [newImages[index], newImages[index + 1]] = [
+      newImages[index + 1],
+      newImages[index],
+    ];
 
     onContentChange({
       ...content,
@@ -66,11 +72,15 @@ export function GallerySegmentForm({
     });
   };
 
-  const handleImageFieldChange = (imageId: string, field: keyof GalleryImage, value: string) => {
+  const handleImageFieldChange = (
+    imageId: string,
+    field: keyof GalleryImage,
+    value: string,
+  ) => {
     onContentChange({
       ...content,
       images: images.map((image) =>
-        image.id === imageId ? { ...image, [field]: value } : image
+        image.id === imageId ? { ...image, [field]: value } : image,
       ),
     });
   };
@@ -87,7 +97,9 @@ export function GallerySegmentForm({
       console.error("Error uploading image:", error);
       showError(
         "Upload Failed",
-        error instanceof Error ? error.message : "Failed to upload image. Please try again."
+        error instanceof Error
+          ? error.message
+          : "Failed to upload image. Please try again.",
       );
     } finally {
       setUploadingImageId(null);
@@ -98,15 +110,21 @@ export function GallerySegmentForm({
     <Box display="flex" flexDirection="column" gap="lg">
       {/* Gallery Settings */}
       <Box display="flex" flexDirection="column" gap="md">
-        <Heading level={4}>Gallery Settings</Heading>
+        <Heading level={4} size="2xl">
+          Gallery Settings
+        </Heading>
 
         <Box display="flex" flexDirection="column" gap="sm">
-          <Text variant="body-sm" as="label">Images per Row</Text>
+          <Text variant="body-sm" as="label">
+            Images per Row
+          </Text>
           <Box display="flex" gap="sm" flexWrap="wrap">
             <Button
               type="button"
               size="sm"
-              variant={(content.imagesPerRow as number) === 3 ? "primary" : "outline"}
+              variant={
+                (content.imagesPerRow as number) === 3 ? "primary" : "outline"
+              }
               onClick={() => onContentChange({ ...content, imagesPerRow: 3 })}
             >
               3 Images
@@ -114,7 +132,11 @@ export function GallerySegmentForm({
             <Button
               type="button"
               size="sm"
-              variant={(content.imagesPerRow as number) === 4 || !content.imagesPerRow ? "primary" : "outline"}
+              variant={
+                (content.imagesPerRow as number) === 4 || !content.imagesPerRow
+                  ? "primary"
+                  : "outline"
+              }
               onClick={() => onContentChange({ ...content, imagesPerRow: 4 })}
             >
               4 Images
@@ -122,15 +144,19 @@ export function GallerySegmentForm({
             <Button
               type="button"
               size="sm"
-              variant={(content.imagesPerRow as number) === 5 ? "primary" : "outline"}
+              variant={
+                (content.imagesPerRow as number) === 5 ? "primary" : "outline"
+              }
               onClick={() => onContentChange({ ...content, imagesPerRow: 5 })}
             >
               5 Images
             </Button>
+            <Box display="flex" justifyContent="flex-end">
+              <Button type="button" onClick={handleAddImage}>
+                Add New Image
+              </Button>
+            </Box>
           </Box>
-          <Text variant="body-sm" semantic="secondary">
-            Rows will auto-adjust based on number of images. Responsive: Mobile (1-2 cols), Medium (2-3 cols), Large (3-5 cols)
-          </Text>
         </Box>
       </Box>
 
@@ -152,8 +178,15 @@ export function GallerySegmentForm({
                 border="default"
                 corners="default"
               >
-                <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="2">
-                  <Text variant="body-sm" weight="medium">Image {index + 1}</Text>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  marginBottom="2"
+                >
+                  <Text variant="body-sm" weight="medium">
+                    Image {index + 1}
+                  </Text>
                   <Box display="flex" gap="xs">
                     <Button
                       type="button"
@@ -191,17 +224,17 @@ export function GallerySegmentForm({
                   {image.imageUrl && (
                     <div
                       style={{
-                        width: '100%',
-                        aspectRatio: '4 / 3',
-                        borderRadius: 'var(--mond-radius-sm)',
-                        overflow: 'hidden',
-                        backgroundColor: 'var(--mond-color-surface-secondary)',
+                        width: "100%",
+                        aspectRatio: "4 / 3",
+                        borderRadius: "var(--mond-radius-sm)",
+                        overflow: "hidden",
+                        backgroundColor: "var(--mond-color-surface-secondary)",
                         backgroundImage: `url(${image.imageUrl})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
                       }}
                       role="img"
-                      aria-label={image.alt || 'Preview'}
+                      aria-label={image.alt || "Preview"}
                     />
                   )}
 
@@ -213,7 +246,13 @@ export function GallerySegmentForm({
                       type="text"
                       placeholder="https://example.com/image.jpg"
                       value={image.imageUrl}
-                      onChange={(e) => handleImageFieldChange(image.id, "imageUrl", e.target.value)}
+                      onChange={(e) =>
+                        handleImageFieldChange(
+                          image.id,
+                          "imageUrl",
+                          e.target.value,
+                        )
+                      }
                     />
                   </Box>
 
@@ -253,7 +292,13 @@ export function GallerySegmentForm({
                       type="text"
                       placeholder="Image caption (optional)"
                       value={image.caption}
-                      onChange={(e) => handleImageFieldChange(image.id, "caption", e.target.value)}
+                      onChange={(e) =>
+                        handleImageFieldChange(
+                          image.id,
+                          "caption",
+                          e.target.value,
+                        )
+                      }
                     />
                   </Box>
 
@@ -265,7 +310,9 @@ export function GallerySegmentForm({
                       type="text"
                       placeholder="Descriptive alt text for accessibility"
                       value={image.alt}
-                      onChange={(e) => handleImageFieldChange(image.id, "alt", e.target.value)}
+                      onChange={(e) =>
+                        handleImageFieldChange(image.id, "alt", e.target.value)
+                      }
                     />
                   </Box>
                 </Box>
@@ -274,13 +321,6 @@ export function GallerySegmentForm({
           </Box>
         </Box>
       )}
-
-      {/* Add Image Button */}
-      <Box>
-        <Button type="button" variant="outline" onClick={handleAddImage}>
-          Add Image
-        </Button>
-      </Box>
 
       {/* Live Preview */}
       {images.length > 0 && (

@@ -194,6 +194,9 @@ export interface FormSubmission {
 // ============================================
 // SITE SETTINGS
 // ============================================
+export type HeadingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl';
+export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+
 export interface SiteSettings {
   id: string;
   // General Settings
@@ -203,6 +206,7 @@ export interface SiteSettings {
 
   // Header Settings
   stickyHeader?: boolean;
+  siteNameSize?: HeadingSize;
 
   // PayPal Integration
   paypalClientId?: string;
@@ -213,6 +217,7 @@ export interface SiteSettings {
 
   // Logo and Favicon (URLs to uploaded files)
   logoUrl?: string;
+  logoSize?: AvatarSize;
   faviconUrl?: string;
 
   // Timestamps

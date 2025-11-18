@@ -23,7 +23,9 @@ export default async function PublicLayout({ children }: PublicLayoutProps) {
         user={user}
         siteName={settings?.siteName}
         logoUrl={settings?.logoUrl}
+        logoSize={settings?.logoSize}
         stickyHeader={settings?.stickyHeader}
+        siteNameSize={settings?.siteNameSize}
       />
       {children}
     </>

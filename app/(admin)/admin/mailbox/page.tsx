@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Box, Heading, Text, Button, Spinner } from "@mond-design-system/theme";
+import { Box, Heading, Text, Button, Spinner, Badge } from "@mond-design-system/theme";
 import {
   Input,
   Accordion,
@@ -10,7 +10,7 @@ import {
   ModalFooter,
 } from "@mond-design-system/theme/client";
 import { useToast } from "@/app/providers/ToastProvider";
-import { getFormSubmissionsAction, deleteFormSubmissionAction } from "@/app/actions/mailbox";
+import { getFormSubmissionsAction, deleteFormSubmissionAction, markSubmissionAsReadAction } from "@/app/actions/mailbox";
 import type { FormSubmission } from "@/app/types";
 
 export default function MailboxPage() {
@@ -21,6 +21,7 @@ export default function MailboxPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [openAccordionId, setOpenAccordionId] = useState<string | null>(null);
   const { showSuccess, showError } = useToast();
 
   // Load submissions on mount
@@ -40,6 +41,30 @@ export default function MailboxPage() {
     }
     loadSubmissions();
   }, [showError]);
+
+  // Handle URL hash to auto-expand specific submission
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (!loading && filteredSubmissions.length > 0) {
+        const hash = window.location.hash.slice(1); // Remove the #
+        if (hash && filteredSubmissions.find(s => s.id === hash)) {
+          setOpenAccordionId(hash);
+          // Clear the hash after setting
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      }
+    };
+
+    // Check on mount
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [loading, filteredSubmissions]);
 
   // Filter submissions when search query changes
   useEffect(() => {
@@ -99,13 +124,43 @@ export default function MailboxPage() {
     return date.toLocaleString();
   };
 
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      const result = await markSubmissionAsReadAction(id);
+      if (result.success) {
+        // Update local state to mark as read
+        setSubmissions((prev) =>
+          prev.map((s) => (s.id === id ? { ...s, read: true } : s))
+        );
+      }
+    } catch (error) {
+      console.error('Error marking submission as read:', error);
+    }
+  };
+
   const getSubmissionTitle = (submission: FormSubmission) => {
     const firstField = Object.entries(submission.data)[0];
     const preview = firstField
       ? `${firstField[0]}: ${firstField[1]}`
       : "Form Submission";
     const date = formatDate(submission.submittedAt);
-    return `${date} - ${preview}`;
+
+    return (
+      <Box display="flex" alignItems="center" gap="sm" justifyContent="space-between" width="full">
+        <Text variant="body">{`${date} - ${preview}`}</Text>
+        {!submission.read && (
+          <Box
+            className="rounded-full"
+            style={{
+              width: '8px',
+              height: '8px',
+              backgroundColor: '#10b981',
+              flexShrink: 0,
+            }}
+          />
+        )}
+      </Box>
+    );
   };
 
   const accordionItems = filteredSubmissions.map((submission) => ({
@@ -158,6 +213,7 @@ export default function MailboxPage() {
       {/* Search */}
       <Box width="half">
         <Input
+          id="mailbox-search"
           type="text"
           placeholder="Search submissions..."
           value={searchQuery}
@@ -179,7 +235,23 @@ export default function MailboxPage() {
           </Text>
         </Box>
       ) : (
-        <Accordion items={accordionItems} mode="single" variant="bordered" />
+        <Accordion
+          items={accordionItems}
+          mode="single"
+          variant="bordered"
+          expandedIds={openAccordionId ? [openAccordionId] : []}
+          onExpandedChange={(expandedIds) => {
+            setOpenAccordionId(expandedIds && expandedIds.length > 0 ? expandedIds[0] : null);
+            // Mark submission as read when accordion item is opened
+            if (expandedIds && expandedIds.length > 0) {
+              const openedId = expandedIds[0];
+              const submission = filteredSubmissions.find(s => s.id === openedId);
+              if (submission && !submission.read) {
+                handleMarkAsRead(openedId);
+              }
+            }
+          }}
+        />
       )}
 
       {/* Stats */}

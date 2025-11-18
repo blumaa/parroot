@@ -116,14 +116,14 @@ export function NavigationManager({ initialMenuItems = [], initialPages = [] }: 
     }
   };
 
-  const handleMoveUp = async (index: number) => {
+  const handleMoveUp = async (siblings: MenuItem[], index: number) => {
     if (index === 0) return;
 
-    const newItems = [...menuItems];
-    [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
+    const newSiblings = [...siblings];
+    [newSiblings[index - 1], newSiblings[index]] = [newSiblings[index], newSiblings[index - 1]];
 
     try {
-      const updates = newItems.map((item, idx) => ({
+      const updates = newSiblings.map((item, idx) => ({
         id: item.id,
         order: idx,
       }));
@@ -141,14 +141,14 @@ export function NavigationManager({ initialMenuItems = [], initialPages = [] }: 
     }
   };
 
-  const handleMoveDown = async (index: number) => {
-    if (index === menuItems.length - 1) return;
+  const handleMoveDown = async (siblings: MenuItem[], index: number) => {
+    if (index === siblings.length - 1) return;
 
-    const newItems = [...menuItems];
-    [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+    const newSiblings = [...siblings];
+    [newSiblings[index], newSiblings[index + 1]] = [newSiblings[index + 1], newSiblings[index]];
 
     try {
-      const updates = newItems.map((item, idx) => ({
+      const updates = newSiblings.map((item, idx) => ({
         id: item.id,
         order: idx,
       }));
@@ -171,10 +171,19 @@ export function NavigationManager({ initialMenuItems = [], initialPages = [] }: 
       const result = await updateMenuItemAction(itemId, { variant });
       if (result.success) {
         showSuccess('Success', 'Variant updated');
-        // Update local state
-        setMenuItems(menuItems.map(item =>
-          item.id === itemId ? { ...item, variant } : item
-        ));
+        // Update local state (including nested children)
+        const updateVariant = (items: MenuItem[]): MenuItem[] => {
+          return items.map(item => {
+            if (item.id === itemId) {
+              return { ...item, variant };
+            }
+            if (item.children && item.children.length > 0) {
+              return { ...item, children: updateVariant(item.children) };
+            }
+            return item;
+          });
+        };
+        setMenuItems(updateVariant(menuItems));
       } else {
         showError('Error', result.error || 'Failed to update variant');
       }
@@ -189,10 +198,19 @@ export function NavigationManager({ initialMenuItems = [], initialPages = [] }: 
       const result = await updateMenuItemAction(itemId, { size });
       if (result.success) {
         showSuccess('Success', 'Size updated');
-        // Update local state
-        setMenuItems(menuItems.map(item =>
-          item.id === itemId ? { ...item, size } : item
-        ));
+        // Update local state (including nested children)
+        const updateSize = (items: MenuItem[]): MenuItem[] => {
+          return items.map(item => {
+            if (item.id === itemId) {
+              return { ...item, size };
+            }
+            if (item.children && item.children.length > 0) {
+              return { ...item, children: updateSize(item.children) };
+            }
+            return item;
+          });
+        };
+        setMenuItems(updateSize(menuItems));
       } else {
         showError('Error', result.error || 'Failed to update size');
       }
@@ -207,10 +225,19 @@ export function NavigationManager({ initialMenuItems = [], initialPages = [] }: 
       const result = await updateMenuItemAction(itemId, { visible });
       if (result.success) {
         showSuccess('Success', visible ? 'Menu item shown' : 'Menu item hidden');
-        // Update local state
-        setMenuItems(menuItems.map(item =>
-          item.id === itemId ? { ...item, visible } : item
-        ));
+        // Update local state (including nested children)
+        const updateVisibility = (items: MenuItem[]): MenuItem[] => {
+          return items.map(item => {
+            if (item.id === itemId) {
+              return { ...item, visible };
+            }
+            if (item.children && item.children.length > 0) {
+              return { ...item, children: updateVisibility(item.children) };
+            }
+            return item;
+          });
+        };
+        setMenuItems(updateVisibility(menuItems));
       } else {
         showError('Error', result.error || 'Failed to update visibility');
       }
@@ -323,7 +350,7 @@ export function NavigationManager({ initialMenuItems = [], initialPages = [] }: 
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => handleMoveUp(index)}
+                onClick={() => handleMoveUp(siblings, index)}
               >
                 ↑
               </Button>
@@ -333,7 +360,7 @@ export function NavigationManager({ initialMenuItems = [], initialPages = [] }: 
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => handleMoveDown(index)}
+                onClick={() => handleMoveDown(siblings, index)}
               >
                 ↓
               </Button>
@@ -343,7 +370,7 @@ export function NavigationManager({ initialMenuItems = [], initialPages = [] }: 
           {/* Delete */}
           <Button
             type="button"
-            variant="outline"
+            variant="destructive"
             size="sm"
             onClick={() => setDeleteConfirm(item.id)}
           >

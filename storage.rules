@@ -26,6 +26,13 @@ service firebase.storage {
       allow write: if isEditor();
     }
 
+    // Settings assets (logo, favicon) - admin only write, public read
+    match /settings/{fileName} {
+      allow read: if true; // Public read access
+      allow write: if isEditor(); // Only authenticated users can upload
+      allow delete: if isEditor(); // Only authenticated users can delete
+    }
+
     // Segment assets (carousel images, gallery images, etc.)
     match /segments/{segmentType}/{fileName} {
       allow read: if true; // Public read access for all segment assets

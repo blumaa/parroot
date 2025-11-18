@@ -192,8 +192,6 @@ export function SegmentForm({
 
         {/* Dynamic Content Fields Based on Type */}
         <Box display="flex" flexDirection="column" gap="md">
-          <Heading level={3}>Content</Heading>
-
           {type === "text-block" && (
             <TextBlockSegmentForm
               content={content}

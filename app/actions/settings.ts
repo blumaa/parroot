@@ -11,8 +11,10 @@ export async function updateSettings(formData: FormData) {
   const siteDescription = formData.get('siteDescription') as string;
   const contactEmail = formData.get('contactEmail') as string;
   const logoUrl = formData.get('logoUrl') as string;
+  const logoSize = formData.get('logoSize') as string;
   const faviconUrl = formData.get('faviconUrl') as string;
   const stickyHeader = formData.get('stickyHeader') === 'true';
+  const siteNameSize = formData.get('siteNameSize') as string;
   const paypalClientId = formData.get('paypalClientId') as string;
   const paypalMode = formData.get('paypalMode') as 'sandbox' | 'production';
   const googleAnalyticsId = formData.get('googleAnalyticsId') as string;
@@ -30,8 +32,14 @@ export async function updateSettings(formData: FormData) {
     if (logoUrl) {
       settingsData.logoUrl = logoUrl;
     }
+    if (logoSize) {
+      settingsData.logoSize = logoSize;
+    }
     if (faviconUrl) {
       settingsData.faviconUrl = faviconUrl;
+    }
+    if (siteNameSize) {
+      settingsData.siteNameSize = siteNameSize;
     }
     if (paypalClientId) {
       settingsData.paypalClientId = paypalClientId;
