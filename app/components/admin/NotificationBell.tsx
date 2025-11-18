@@ -15,23 +15,39 @@ import { NotificationList } from './NotificationList';
 
 export function NotificationBell() {
   const router = useRouter();
-  const { showSuccess, showError } = useToast();
+  const { showError } = useToast();
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [unreadSubmissions, setUnreadSubmissions] = useState<FormSubmission[]>([]);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   // Load unread count on mount
   useEffect(() => {
+    const loadUnreadCount = async () => {
+      try {
+        const count = await getUnreadCountAction();
+        setUnreadCount(count);
+      } catch (error) {
+        console.error('Error loading unread count:', error);
+      }
+    };
     loadUnreadCount();
   }, []);
 
   // Load unread submissions when popover opens
   useEffect(() => {
-    if (isPopoverOpen) {
-      loadUnreadSubmissions();
-    }
-  }, [isPopoverOpen]);
+    if (!isPopoverOpen) return;
+
+    const loadUnreadSubmissions = async () => {
+      try {
+        const submissions = await getUnreadSubmissionsAction(10);
+        setUnreadSubmissions(submissions);
+      } catch (error) {
+        console.error('Error loading unread submissions:', error);
+        showError('Failed to load notifications');
+      }
+    };
+    loadUnreadSubmissions();
+  }, [isPopoverOpen, showError]);
 
   const loadUnreadCount = async () => {
     try {
@@ -44,14 +60,11 @@ export function NotificationBell() {
 
   const loadUnreadSubmissions = async () => {
     try {
-      setIsLoading(true);
       const submissions = await getUnreadSubmissionsAction(10);
       setUnreadSubmissions(submissions);
     } catch (error) {
       console.error('Error loading unread submissions:', error);
       showError('Failed to load notifications');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -105,7 +118,7 @@ export function NotificationBell() {
         iconOnly
         aria-label="Notifications"
       >
-        <Icon color={unreadCount > 0 ? "#10b981" : "currentColor"}>
+        <Icon color={unreadCount > 0 ? "#10b981" : "currentColor"} badge={unreadCount > 0 ? unreadCount : undefined}>
           <svg
             width="100%"
             viewBox="0 0 24 24"

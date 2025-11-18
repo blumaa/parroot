@@ -33,11 +33,12 @@ export function NotificationList({
             </Text>
           </Box>
         ) : (
-          submissions.map((submission) => (
+          submissions.map((submission, index) => (
             <NotificationItem
               key={submission.id}
               submission={submission}
               onClick={() => onMarkAsRead(submission.id)}
+              isLast={index === submissions.length - 1}
             />
           ))
         )}

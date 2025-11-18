@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Box, Heading, Text, Button, Spinner, Badge } from "@mond-design-system/theme";
+import { Box, Heading, Text, Button, Spinner } from "@mond-design-system/theme";
 import {
   Input,
   Accordion,
@@ -149,15 +149,11 @@ export default function MailboxPage() {
       <Box display="flex" alignItems="center" gap="sm" justifyContent="space-between" width="full">
         <Text variant="body">{`${date} - ${preview}`}</Text>
         {!submission.read && (
-          <Box
-            className="rounded-full"
-            style={{
-              width: '8px',
-              height: '8px',
-              backgroundColor: '#10b981',
-              flexShrink: 0,
-            }}
-          />
+          <Box as="span" display="inline-block">
+            <svg width="8" height="8" viewBox="0 0 8 8">
+              <circle cx="4" cy="4" r="4" fill="#10b981" />
+            </svg>
+          </Box>
         )}
       </Box>
     );

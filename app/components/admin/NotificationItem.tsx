@@ -2,13 +2,15 @@
 
 import { Box, Text } from '@mond-design-system/theme';
 import type { FormSubmission } from '@/app/types';
+import './notification.css';
 
 interface NotificationItemProps {
   submission: FormSubmission;
   onClick: () => void;
+  isLast?: boolean;
 }
 
-export function NotificationItem({ submission, onClick }: NotificationItemProps) {
+export function NotificationItem({ submission, onClick, isLast = false }: NotificationItemProps) {
   // Get first form field for preview
   const firstField = Object.entries(submission.data)[0];
   const preview = firstField
@@ -37,26 +39,21 @@ export function NotificationItem({ submission, onClick }: NotificationItemProps)
     <Box
       onClick={onClick}
       padding="3"
-      className="cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100"
+      className="notification-item"
       display="flex"
       flexDirection="column"
       gap="xs"
-      style={{ cursor: 'pointer' }}
     >
       <Box display="flex" justifyContent="space-between" alignItems="center" gap="sm">
         <Text variant="body-sm" weight="medium">
           {truncatedPreview}
         </Text>
         {!submission.read && (
-          <Box
-            className="rounded-full"
-            style={{
-              width: '8px',
-              height: '8px',
-              backgroundColor: '#10b981',
-              flexShrink: 0,
-            }}
-          />
+          <Box as="span" display="inline-block">
+            <svg width="8" height="8" viewBox="0 0 8 8">
+              <circle cx="4" cy="4" r="4" fill="#10b981" />
+            </svg>
+          </Box>
         )}
       </Box>
       <Text variant="body-sm" semantic="secondary">

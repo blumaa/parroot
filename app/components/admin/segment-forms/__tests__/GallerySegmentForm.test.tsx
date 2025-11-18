@@ -31,7 +31,7 @@ describe('GallerySegmentForm', () => {
   it('renders empty form with add image button', () => {
     render(<GallerySegmentForm {...defaultProps} />);
 
-    expect(screen.getByText(/add image/i)).toBeInTheDocument();
+    expect(screen.getByText(/add new image/i)).toBeInTheDocument();
     expect(screen.queryByText(/image 1/i)).not.toBeInTheDocument();
   });
 
@@ -39,7 +39,7 @@ describe('GallerySegmentForm', () => {
     const user = userEvent.setup();
     render(<GallerySegmentForm {...defaultProps} />);
 
-    const addButton = screen.getByText(/add image/i);
+    const addButton = screen.getByText(/add new image/i);
     await user.click(addButton);
 
     expect(mockOnContentChange).toHaveBeenCalled();
