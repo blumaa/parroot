@@ -104,7 +104,6 @@ export function NotificationBell() {
     <Popover
       isOpen={isPopoverOpen}
       onOpenChange={setIsPopoverOpen}
-      placement="bottom-end"
       trigger="click"
       content={
         <NotificationList

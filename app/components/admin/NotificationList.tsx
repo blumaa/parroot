@@ -23,7 +23,6 @@ export function NotificationList({
       <Box className="overflow-y-auto">
         {submissions.length === 0 ? (
           <Box
-            padding="8"
             display="flex"
             justifyContent="center"
             alignItems="center"

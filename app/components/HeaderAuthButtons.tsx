@@ -27,7 +27,7 @@ export function HeaderAuthButtons({ user }: HeaderAuthButtonsProps) {
 
   if (user) {
     return (
-      <Box display="flex" alignItems="center" gap="sm">
+      <Box display="flex" alignItems="center" gap="xxs">
         <Link href={isAdminArea ? '/' : '/admin'} className="no-underline">
           <Button variant="outline" size="sm">
             {isAdminArea ? 'Home' : 'Admin'}
