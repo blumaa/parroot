@@ -1,9 +1,17 @@
-'use client';
+"use client";
 
-import { Box, Button, Text, Heading, Card, Badge } from '@mond-design-system/theme';
-import { useSegments } from '@/app/hooks/useSiteBuilderData';
-import { useSiteBuilder } from '@/app/contexts/SiteBuilderContext';
-import { useDraggable } from '@dnd-kit/core';
+import {
+  Box,
+  Button,
+  Text,
+  Heading,
+  Card,
+  Badge,
+  Spinner,
+} from "@mond-design-system/theme";
+import { useSegments } from "@/app/hooks/useSiteBuilderData";
+import { useSiteBuilder } from "@/app/contexts/SiteBuilderContext";
+import { useDraggable } from "@dnd-kit/core";
 
 function DraggableSegment({
   id,
@@ -19,8 +27,8 @@ function DraggableSegment({
   onEdit: () => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id,
-    data: { type: 'segment', isTemplate: true, segmentId: id },
+    id: `palette-${id}`,
+    data: { type: "segment", isTemplate: true, segmentId: id },
   });
 
   const handleEditClick = (e: React.MouseEvent) => {
@@ -35,21 +43,32 @@ function DraggableSegment({
       {...listeners}
       style={{
         opacity: isDragging ? 0.5 : 1,
-        cursor: isDragging ? 'grabbing' : 'grab',
+        cursor: isDragging ? "grabbing" : "grab",
       }}
     >
-      <Card>
-        <Box padding="3" display="flex" alignItems="center" justifyContent="space-between">
-          <Box flex="1" display="flex" flexDirection="column" gap="xs">
-            <Heading level={4} size="sm">{name}</Heading>
-            <Text variant="body-sm" semantic="secondary">
-              {type}
-            </Text>
-            <Badge variant={status === 'published' ? 'success' : 'default'} size="sm">
-              {status}
-            </Badge>
+      <Card maxWidth="sm">
+        <Box
+          padding="3"
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Box display="flex" flexDirection="column" gap="xs">
+            <Heading level={4} size="sm">
+              {name}
+            </Heading>
+            <Box>
+              <Badge variant="outline" size="sm">
+                {type}
+              </Badge>
+            </Box>
+            {/* <Box> */}
+            {/*   <Badge variant="warning" size="sm"> */}
+            {/*     {status} */}
+            {/*   </Badge> */}
+            {/* </Box> */}
           </Box>
-          <Button variant="ghost" size="sm" onClick={handleEditClick}>
+          <Button variant="outline" size="sm" onClick={handleEditClick}>
             Edit
           </Button>
         </Box>
@@ -65,23 +84,29 @@ export function SegmentPalette() {
   if (isLoading) {
     return (
       <Box padding="4">
-        <Text>Loading segments...</Text>
+        <Spinner size="lg" label="Loading segments..." />
       </Box>
     );
   }
 
   return (
-    <Box display="flex" flexDirection="column" width="full">
-      <Box padding="4">
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Heading level={3} size="md">Segments</Heading>
-          <Button variant="outline" size="md" onClick={() => openSegmentDrawer()}>
-            +
-          </Button>
-        </Box>
+    <Box display="flex" flexDirection="column" padding="8" gap="md" border="subtle">
+      <Box display="flex" alignItems="center" justifyContent="space-between" flex="1">
+        <Heading level={3} size="xl">
+          Segments
+        </Heading>
+        <Button variant="outline" size="md" onClick={() => openSegmentDrawer()}>
+          +
+        </Button>
       </Box>
 
-      <Box padding="4" display="flex" flexDirection="column" gap="sm">
+      <Box
+        paddingLeft="2"
+        paddingRight="2"
+        display="flex"
+        flexDirection="column"
+        gap="sm"
+      >
         {segments && segments.length > 0 ? (
           segments.map((segment) => (
             <DraggableSegment

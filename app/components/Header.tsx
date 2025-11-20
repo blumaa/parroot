@@ -93,7 +93,7 @@ export function Header({
                   return (
                     <Button
                       key={child.id}
-                      variant={isChildSelected ? 'primary' : child.variant}
+                      variant={child.variant}
                       size={child.size}
                       fullWidth
                       onClick={() => {
@@ -124,7 +124,7 @@ export function Header({
         >
           {isPreview ? (
             <Button
-              variant={isSelected ? 'primary' : item.variant}
+              variant={item.variant}
               size={item.size}
               onClick={() => onPageSelect?.(page.id)}
             >
@@ -146,7 +146,7 @@ export function Header({
       return (
         <Button
           key={item.id}
-          variant={isSelected ? 'primary' : item.variant}
+          variant={item.variant}
           size={item.size}
           onClick={() => onPageSelect?.(page.id)}
         >
@@ -179,7 +179,7 @@ export function Header({
         <Box key={item.id} display="flex" flexDirection="column" gap="xs">
           {isPreview ? (
             <Button
-              variant={isSelected ? 'primary' : item.variant}
+              variant={item.variant}
               size={item.size}
               fullWidth
               onClick={() => {
@@ -210,7 +210,7 @@ export function Header({
                 return (
                   <Button
                     key={child.id}
-                    variant={isChildSelected ? 'primary' : child.variant}
+                    variant={child.variant}
                     size={child.size}
                     fullWidth
                     onClick={() => {
@@ -246,7 +246,7 @@ export function Header({
       return (
         <Button
           key={item.id}
-          variant={isSelected ? 'primary' : item.variant}
+          variant={item.variant}
           size={item.size}
           fullWidth
           onClick={() => {

@@ -16,7 +16,9 @@ import {
   getSegments,
   getSegmentById,
   getMenuItems,
+  getSiteSettings,
 } from '@/app/lib/data-access';
+import { getUser } from '@/app/lib/dal';
 import type { Page, Segment, MenuItem } from '@/app/types';
 
 // ============================================
@@ -100,4 +102,20 @@ export async function updateMenuItemAction(id: string, data: Partial<MenuItem>) 
 export async function deleteMenuItemAction(id: string) {
   await deleteMenuItem(id);
   revalidatePath('/admin/site-builder');
+}
+
+// ============================================
+// SITE SETTINGS
+// ============================================
+
+export async function getSiteSettingsAction() {
+  return await getSiteSettings();
+}
+
+// ============================================
+// USER
+// ============================================
+
+export async function getUserAction() {
+  return await getUser();
 }

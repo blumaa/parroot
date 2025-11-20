@@ -94,12 +94,6 @@ export function PageCanvas() {
 
   return (
     <Box display="flex" flexDirection="column" gap="md" width="full">
-      <Box display="flex" border="subtle" justifyContent="center">
-        <Heading level={2} size="xl">
-          {page.title}
-        </Heading>
-      </Box>
-
       <Box>
         <DropZone id="header-zone" placeholder="Drop a segment here">
           {headerSegment && (

@@ -31,14 +31,14 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
 
   // Ensure redirect happens before any rendering
   return user ? (
-    <Box display="flex" flexDirection="column" className="h-screen bg-gray-50">
+    <Box display="flex" flexDirection="column" >
       <AdminHeader
         user={user}
         siteName={settings?.siteName}
         hasPostsSegments={hasPostsSegments}
         hasFormSegments={hasFormSegments}
       />
-      <Box as="main" padding="8" flex="1" className="bg-white overflow-auto">
+      <Box as="main" paddingRight="4" paddingLeft="4" flex="1" >
         {children}
       </Box>
     </Box>

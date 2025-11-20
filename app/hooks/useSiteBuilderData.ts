@@ -17,6 +17,8 @@ import {
   createMenuItemAction,
   updateMenuItemAction,
   deleteMenuItemAction,
+  getSiteSettingsAction,
+  getUserAction,
 } from '@/app/actions/siteBuilderActions';
 
 // ============================================
@@ -175,5 +177,27 @@ export function useDeleteMenuItem() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menuItems'] });
     },
+  });
+}
+
+// ============================================
+// SITE SETTINGS
+// ============================================
+
+export function useSiteSettings() {
+  return useQuery({
+    queryKey: ['siteSettings'],
+    queryFn: () => getSiteSettingsAction(),
+  });
+}
+
+// ============================================
+// USER
+// ============================================
+
+export function useUser() {
+  return useQuery({
+    queryKey: ['user'],
+    queryFn: () => getUserAction(),
   });
 }

@@ -41,7 +41,7 @@ export function AdminHeader({
       className="flex items-center justify-between bg-white border-b border-gray-200"
     >
       <Box display="flex" alignItems="center" gap="lg">
-        <Heading level={3} size="md">{siteName}</Heading>
+        <Heading level={3} size="3xl">{siteName}</Heading>
         <Box display="flex" gap="sm">
           {navItems.map((item) => {
             const isActive = pathname === item.href;

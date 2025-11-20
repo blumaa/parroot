@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, createContext, useContext } from "react";
-import { Box, Card, Heading, Text } from "@mond-design-system/theme";
+import {
+  Box,
+  Button,
+  Card,
+  Heading,
+  Spinner,
+  Text,
+} from "@mond-design-system/theme";
 import {
   SiteBuilderProvider,
   useSiteBuilder,
@@ -11,6 +18,7 @@ import { NavigationPreview } from "@/app/components/site-builder/NavigationPrevi
 import { BuilderLayout } from "@/app/components/site-builder/BuilderLayout";
 import { SegmentPalette } from "@/app/components/site-builder/SegmentPalette";
 import { SiteBuilderHeader } from "@/app/components/site-builder/SiteBuilderHeader";
+import { SitePreviewHeader } from "@/app/components/site-builder/SitePreviewHeader";
 import { usePage } from "@/app/hooks/useSiteBuilderData";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 
@@ -107,46 +115,33 @@ function PageEditor({ pageId }: { pageId: string }) {
 
   return (
     <PageEditorContext.Provider value={editorContextValue}>
-      <SiteBuilderHeader />
-      <DropZoneProvider
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        dragOverlay={
-          activeId ? (
-            <Card>
-              <Box padding="3">
-                <Text>Dragging segment...</Text>
-              </Box>
-            </Card>
-          ) : null
-        }
-      >
-        <Box display="flex" width="full">
-          <Box
-            width="third"
-            display="flex"
-            flexDirection="column"
-            border="default"
-          >
+      <Box display="flex" gap="md">
+        <DropZoneProvider
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          dragOverlay={
+            activeId ? (
+              <Card>
+                <Box padding="3">
+                  <Text>Dragging segment...</Text>
+                </Box>
+              </Card>
+            ) : null
+          }
+        >
+          <Box display="flex" flexDirection="column" flex="1">
+            <SitePreviewHeader />
+            <Box border="strong">
+              <NavigationPreview />
+              <BuilderLayout />
+            </Box>
+          </Box>
+          <Box display="flex" flexDirection="column" width="md" justifyContent="center">
+            {/* <SiteBuilderHeader /> */}
             <SegmentPalette />
           </Box>
-
-          <Box display="flex" flexDirection="column" flex="1">
-            <Box
-              padding="4"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Heading level={3} size="2xl">
-                Site Preview
-              </Heading>
-            </Box>
-            <NavigationPreview />
-            <BuilderLayout />
-          </Box>
-        </Box>
-      </DropZoneProvider>
+        </DropZoneProvider>
+      </Box>
     </PageEditorContext.Provider>
   );
 }
@@ -156,12 +151,12 @@ function SiteBuilderContent() {
 
   if (!selectedPageId) {
     return (
-      <>
-        <Box padding="4" display="flex" alignItems="center">
-          <Heading level={2} size="3xl">
-            Site Builder
-          </Heading>
-        </Box>
+      <Box display="flex" flexDirection="column">
+        {/* <Box padding="8" display="flex" alignItems="center"> */}
+        {/*   <Heading level={2} size="3xl"> */}
+        {/*     Site Builder */}
+        {/*   </Heading> */}
+        {/* </Box> */}
         <Box display="flex" flexDirection="column" width="full">
           <NavigationPreview />
           <Box
@@ -170,10 +165,10 @@ function SiteBuilderContent() {
             alignItems="center"
             justifyContent="center"
           >
-            <Text>Select or create a page to begin editing</Text>
+            <Spinner size="lg" />
           </Box>
         </Box>
-      </>
+      </Box>
     );
   }
 
@@ -182,10 +177,8 @@ function SiteBuilderContent() {
 
 export default function SiteBuilderPage() {
   return (
-    <Box border="strong">
-      <SiteBuilderProvider>
-        <SiteBuilderContent />
-      </SiteBuilderProvider>
-    </Box>
+    <SiteBuilderProvider>
+      <SiteBuilderContent />
+    </SiteBuilderProvider>
   );
 }

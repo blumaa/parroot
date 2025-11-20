@@ -96,7 +96,7 @@ export function PageDrawer() {
   };
 
   return (
-    <Drawer isOpen={isPageDrawerOpen} onClose={closePageDrawer}>
+    <Drawer isOpen={isPageDrawerOpen} onClose={closePageDrawer} width='lg'>
       <DrawerHeader onClose={closePageDrawer}>
         <Heading level={3} size="lg">
           {editingPageId ? 'Edit Page' : 'Create New Page'}

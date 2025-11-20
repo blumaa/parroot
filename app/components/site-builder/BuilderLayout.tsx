@@ -8,7 +8,7 @@ import { MenuSettingsDrawer } from './MenuSettingsDrawer';
 
 export function BuilderLayout() {
   return (
-    <Box display="flex" flex="1" width="full" border='default' padding='4'>
+    <Box display="flex" flex="1" width="full" padding='4'>
       <Box flex="1" display="flex" flexDirection="column">
         <PageCanvas />
       </Box>
