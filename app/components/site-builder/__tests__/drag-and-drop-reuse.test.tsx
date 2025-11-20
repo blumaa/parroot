@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { DndContext, useDraggable, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
-import React, { useState } from 'react';
+import { DndContext, DragStartEvent } from '@dnd-kit/core';
+import React from 'react';
 import { SegmentPalette } from '../SegmentPalette';
 import { SiteBuilderProvider } from '@/app/contexts/SiteBuilderContext';
+import type { UseQueryResult } from '@tanstack/react-query';
+import type { Segment } from '@/app/types';
 
 // Mock the data hooks
 vi.mock('@/app/hooks/useSiteBuilderData', () => ({
@@ -30,7 +32,7 @@ describe('Site Builder Drag and Drop - Segment Reuse Bug', () => {
     vi.mocked(useSegments).mockReturnValue({
       data: mockSegments,
       isLoading: false,
-    } as any);
+    } as UseQueryResult<Segment[], Error>);
 
     // Custom DndContext that tracks registered draggable IDs
     function TestDndContext({ children }: { children: React.ReactNode }) {

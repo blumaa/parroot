@@ -3,9 +3,7 @@
 import { useState, createContext, useContext } from "react";
 import {
   Box,
-  Button,
   Card,
-  Heading,
   Spinner,
   Text,
 } from "@mond-design-system/theme";
@@ -17,7 +15,6 @@ import { DropZoneProvider } from "@mond-design-system/theme/client";
 import { NavigationPreview } from "@/app/components/site-builder/NavigationPreview";
 import { BuilderLayout } from "@/app/components/site-builder/BuilderLayout";
 import { SegmentPalette } from "@/app/components/site-builder/SegmentPalette";
-import { SiteBuilderHeader } from "@/app/components/site-builder/SiteBuilderHeader";
 import { SitePreviewHeader } from "@/app/components/site-builder/SitePreviewHeader";
 import { usePage } from "@/app/hooks/useSiteBuilderData";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";

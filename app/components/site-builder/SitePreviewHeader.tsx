@@ -5,7 +5,6 @@ import {
   Box,
   Heading,
   Button,
-  Badge,
   Spinner,
 } from "@mond-design-system/theme";
 import { usePageEditor } from "@/app/(admin)/admin/site-builder/page";
