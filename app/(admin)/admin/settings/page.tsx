@@ -1,5 +1,4 @@
-import { unstable_noStore as noStore } from 'next/cache';
-import { Box, Heading, Text } from '@mond-design-system/theme';
+import { Box } from '@mond-design-system/theme';
 import { verifySession } from '@/app/lib/dal';
 import { getSiteSettings, initializeDefaultSettings } from '@/app/lib/data-access';
 import { SettingsForm } from '@/app/components/admin/SettingsForm';

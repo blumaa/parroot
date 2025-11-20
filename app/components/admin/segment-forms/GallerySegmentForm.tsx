@@ -238,50 +238,28 @@ export function GallerySegmentForm({
                     />
                   )}
 
-                  {/* Image URL Input */}
-                  <Box>
-                    <Input
-                      id={`image-url-${image.id}`}
-                      label="Image URL"
-                      type="text"
-                      placeholder="https://example.com/image.jpg"
-                      value={image.imageUrl}
-                      onChange={(e) =>
-                        handleImageFieldChange(
-                          image.id,
-                          "imageUrl",
-                          e.target.value,
-                        )
-                      }
-                    />
-                  </Box>
-
                   {/* File Upload */}
                   <Box>
-                    <Text variant="body-sm" semantic="secondary" as="label">
-                      Or upload an image
-                    </Text>
-                    <Box marginTop="1">
-                      <Input
-                        id={`image-upload-${image.id}`}
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            handleImageUpload(image.id, file);
-                          }
-                        }}
-                        disabled={uploadingImageId === image.id}
-                      />
-                      {uploadingImageId === image.id && (
-                        <Box marginTop="1">
-                          <Text variant="body-sm" semantic="secondary">
-                            Uploading...
-                          </Text>
-                        </Box>
-                      )}
-                    </Box>
+                    <Input
+                      id={`image-upload-${image.id}`}
+                      label="Upload Image"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleImageUpload(image.id, file);
+                        }
+                      }}
+                      disabled={uploadingImageId === image.id}
+                    />
+                    {uploadingImageId === image.id && (
+                      <Box marginTop="1">
+                        <Text variant="body-sm" semantic="secondary">
+                          Uploading...
+                        </Text>
+                      </Box>
+                    )}
                   </Box>
 
                   {/* Caption */}

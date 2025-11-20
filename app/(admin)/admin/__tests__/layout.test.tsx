@@ -5,11 +5,7 @@ import AdminLayout from '../layout';
 
 // Mock admin components
 vi.mock('@/app/components/admin/AdminHeader', () => ({
-  AdminHeader: ({ user }: { user: { email: string } }) => <div data-testid="admin-header">{user.email}</div>,
-}));
-
-vi.mock('@/app/components/admin/AdminNavigation', () => ({
-  AdminNavigation: () => <nav data-testid="admin-navigation">Navigation</nav>,
+  AdminHeader: ({ user }: { user: { email: string }; hasPostsSegments: boolean; hasFormSegments: boolean }) => <div data-testid="admin-header">{user.email}</div>,
 }));
 
 // Mock getUser
@@ -45,7 +41,6 @@ vi.mock('@/app/lib/data-access', () => ({
     updatedBy: 'test',
   }),
   getSegments: vi.fn().mockResolvedValue([]),
-  getFormSubmissions: vi.fn().mockResolvedValue([]),
 }));
 
 // Mock Next.js redirect
@@ -69,7 +64,6 @@ describe('AdminLayout', () => {
     const layout = await AdminLayout({ children: <div>Test Content</div> });
     const { getByText, getByTestId } = render(layout as React.ReactElement);
 
-    expect(getByTestId('admin-navigation')).toBeInTheDocument();
     expect(getByTestId('admin-header')).toBeInTheDocument();
     expect(getByText('Test Content')).toBeInTheDocument();
   });

@@ -69,15 +69,61 @@ export async function getPageBySlug(slug: string): Promise<Page | null> {
   } as Page;
 }
 
+export async function createPage(data: Omit<Page, 'id' | 'createdAt' | 'updatedAt'>): Promise<Page> {
+  const db = getAdminDb();
+  const now = new Date();
+
+  const docRef = await db.collection('pages').add({
+    ...data,
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  const doc = await docRef.get();
+  return {
+    id: doc.id,
+    ...doc.data(),
+    createdAt: now,
+    updatedAt: now,
+  } as Page;
+}
+
+export async function updatePage(id: string, data: Partial<Page>): Promise<Page> {
+  const db = getAdminDb();
+  const now = new Date();
+
+  await db.collection('pages').doc(id).update({
+    ...data,
+    updatedAt: now,
+  });
+
+  const doc = await db.collection('pages').doc(id).get();
+  return {
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data()?.createdAt?.toDate(),
+    updatedAt: now,
+  } as Page;
+}
+
+export async function deletePage(id: string): Promise<void> {
+  const db = getAdminDb();
+  await db.collection('pages').doc(id).delete();
+}
+
 // ============================================================================
 // SEGMENTS
 // ============================================================================
 
-export async function getSegments(): Promise<Segment[]> {
+export async function getSegments(filters?: { status?: 'draft' | 'published' }): Promise<Segment[]> {
   const db = getAdminDb();
-  const snapshot = await db.collection('segments')
-    .orderBy('updatedAt', 'desc')
-    .get();
+  let query: Query = db.collection('segments').orderBy('updatedAt', 'desc');
+
+  if (filters?.status) {
+    query = query.where('status', '==', filters.status);
+  }
+
+  const snapshot = await query.get();
 
   return snapshot.docs.map(doc => ({
     id: doc.id,
@@ -130,6 +176,48 @@ export async function getSegmentsByIds(ids: string[]): Promise<Segment[]> {
 
   // Return in the same order as the input ids
   return ids.map(id => segments.find(s => s.id === id)).filter(Boolean) as Segment[];
+}
+
+export async function createSegment(data: Omit<Segment, 'id' | 'createdAt' | 'updatedAt'>): Promise<Segment> {
+  const db = getAdminDb();
+  const now = new Date();
+
+  const docRef = await db.collection('segments').add({
+    ...data,
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  const doc = await docRef.get();
+  return {
+    id: doc.id,
+    ...doc.data(),
+    createdAt: now,
+    updatedAt: now,
+  } as Segment;
+}
+
+export async function updateSegment(id: string, data: Partial<Segment>): Promise<Segment> {
+  const db = getAdminDb();
+  const now = new Date();
+
+  await db.collection('segments').doc(id).update({
+    ...data,
+    updatedAt: now,
+  });
+
+  const doc = await db.collection('segments').doc(id).get();
+  return {
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data()?.createdAt?.toDate(),
+    updatedAt: now,
+  } as Segment;
+}
+
+export async function deleteSegment(id: string): Promise<void> {
+  const db = getAdminDb();
+  await db.collection('segments').doc(id).delete();
 }
 
 // ============================================================================
@@ -233,7 +321,6 @@ export async function getMenuItems(filters?: { visible?: boolean }): Promise<Men
     return {
       id: doc.id,
       pageId: data.pageId,
-      label: data.label,
       parentId: data.parentId || undefined,
       order: data.order,
       visible: data.visible ?? true,
@@ -280,6 +367,64 @@ export async function getMenuItems(filters?: { visible?: boolean }): Promise<Men
   });
 
   return topLevelItems;
+}
+
+export async function createMenuItem(data: Omit<MenuItem, 'id' | 'createdAt' | 'updatedAt' | 'children'>): Promise<MenuItem> {
+  const db = getAdminDb();
+  const now = new Date();
+
+  const docRef = await db.collection('navigation').add({
+    ...data,
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  const doc = await docRef.get();
+  const docData = doc.data();
+  return {
+    id: doc.id,
+    pageId: docData?.pageId,
+    parentId: docData?.parentId,
+    order: docData?.order,
+    visible: docData?.visible ?? true,
+    variant: docData?.variant || 'ghost',
+    size: docData?.size || 'md',
+    createdAt: now,
+    updatedAt: now,
+    createdBy: docData?.createdBy,
+    updatedBy: docData?.updatedBy,
+  } as MenuItem;
+}
+
+export async function updateMenuItem(id: string, data: Partial<MenuItem>): Promise<MenuItem> {
+  const db = getAdminDb();
+  const now = new Date();
+
+  await db.collection('navigation').doc(id).update({
+    ...data,
+    updatedAt: now,
+  });
+
+  const doc = await db.collection('navigation').doc(id).get();
+  const docData = doc.data();
+  return {
+    id: doc.id,
+    pageId: docData?.pageId,
+    parentId: docData?.parentId,
+    order: docData?.order,
+    visible: docData?.visible ?? true,
+    variant: docData?.variant || 'ghost',
+    size: docData?.size || 'md',
+    createdAt: docData?.createdAt?.toDate(),
+    updatedAt: now,
+    createdBy: docData?.createdBy,
+    updatedBy: docData?.updatedBy,
+  } as MenuItem;
+}
+
+export async function deleteMenuItem(id: string): Promise<void> {
+  const db = getAdminDb();
+  await db.collection('navigation').doc(id).delete();
 }
 
 // ============================================================================

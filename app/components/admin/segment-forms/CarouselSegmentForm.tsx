@@ -191,44 +191,28 @@ export function CarouselSegmentForm({
               </Box>
 
               <Box display="flex" flexDirection="column" gap="md">
-                {/* Image URL Input */}
-                <Box>
-                  <Input
-                    id={`image-url-${slide.id}`}
-                    label="Image URL"
-                    type="text"
-                    placeholder="https://example.com/image.jpg"
-                    value={slide.imageUrl}
-                    onChange={(e) => handleSlideFieldChange(slide.id, "imageUrl", e.target.value)}
-                  />
-                </Box>
-
                 {/* File Upload */}
                 <Box>
-                  <Text variant="body-sm" semantic="secondary" as="label">
-                    Or upload an image
-                  </Text>
-                  <Box marginTop="2">
-                    <Input
-                      id={`image-upload-${slide.id}`}
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          handleImageUpload(slide.id, file);
-                        }
-                      }}
-                      disabled={uploadingSlideId === slide.id}
-                    />
-                    {uploadingSlideId === slide.id && (
-                      <Box marginTop="1">
-                        <Text variant="body-sm" semantic="secondary">
-                          Uploading...
-                        </Text>
-                      </Box>
-                    )}
-                  </Box>
+                  <Input
+                    id={`image-upload-${slide.id}`}
+                    label="Upload Image"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleImageUpload(slide.id, file);
+                      }
+                    }}
+                    disabled={uploadingSlideId === slide.id}
+                  />
+                  {uploadingSlideId === slide.id && (
+                    <Box marginTop="1">
+                      <Text variant="body-sm" semantic="secondary">
+                        Uploading...
+                      </Text>
+                    </Box>
+                  )}
                 </Box>
 
                 {/* Title */}

@@ -7,14 +7,15 @@ import { NotificationBell } from "./admin/NotificationBell";
 
 interface HeaderAdminAreaProps {
   user: { id: string; email: string } | null;
+  hasFormSegments?: boolean;
 }
 
-export function HeaderAdminArea({ user }: HeaderAdminAreaProps) {
+export function HeaderAdminArea({ user, hasFormSegments = false }: HeaderAdminAreaProps) {
   return (
     <Box display="flex" gap="xxs">
       <Box display="flex">
         <LightSwitch />
-        {user && <NotificationBell />}
+        {user && hasFormSegments && <NotificationBell />}
       </Box>
       <HeaderAuthButtons user={user} />
     </Box>

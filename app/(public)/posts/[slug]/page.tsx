@@ -23,11 +23,18 @@ export default async function PostPage({ params }: PostPageProps) {
   // Get the segment to find which page it belongs to
   const segment = await getSegmentById(post.segmentId);
 
-  // Find the page that contains this segment
+  // Find the page that contains this segment (support both old and new format)
   const allPages = await getPages({ status: "published" });
-  const parentPage = allPages.find((page) =>
-    page.segments.includes(post.segmentId),
-  );
+  const parentPage = allPages.find((page) => {
+    // Check new format
+    if (page.headerSegmentId === post.segmentId ||
+        page.mainSegmentId === post.segmentId ||
+        page.footerSegmentId === post.segmentId) {
+      return true;
+    }
+    // Check old format
+    return page.segments?.includes(post.segmentId);
+  });
   const backUrl = parentPage ? `/${parentPage.slug}` : "/";
 
   return (

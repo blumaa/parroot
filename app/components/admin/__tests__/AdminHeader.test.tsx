@@ -42,13 +42,13 @@ describe('AdminHeader', () => {
   };
 
   it('renders user email', () => {
-    render(<AdminHeader user={mockUser} />);
+    render(<AdminHeader user={mockUser} hasPostsSegments={false} hasFormSegments={false} />);
 
     expect(screen.getByText('admin@example.com')).toBeInTheDocument();
   });
 
   it('renders logout button', () => {
-    render(<AdminHeader user={mockUser} />);
+    render(<AdminHeader user={mockUser} hasPostsSegments={false} hasFormSegments={false} />);
 
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
   });

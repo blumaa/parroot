@@ -296,7 +296,7 @@ export function NavigationManager({ initialMenuItems = [], initialPages = [] }: 
               </Text>
             </Box>
             <Box display="flex" flexDirection="column">
-              <Text variant="body">{item.label}</Text>
+              <Text variant="body">{page?.title || 'Untitled'}</Text>
               <Text variant="body-sm" semantic="secondary">
                 /{page?.slug || 'unknown'}
               </Text>

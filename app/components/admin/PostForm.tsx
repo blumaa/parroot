@@ -3,7 +3,7 @@
 import { useState, useMemo, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Text, Button, Divider, Heading, Spinner } from "@mond-design-system/theme";
-import { Input, Radio } from "@mond-design-system/theme/client";
+import { Input } from "@mond-design-system/theme/client";
 import { generateSlug, generateExcerpt } from "@/app/utils/posts";
 import { createPostAction, updatePostAction, checkPostSlugUniqueAction } from "@/app/actions/posts";
 import { uploadFile } from "@/app/utils/storage";
@@ -28,7 +28,6 @@ export function PostForm({ segmentId, userId, userName, post }: PostFormProps) {
   const [title, setTitle] = useState(post?.title || "");
   const [featuredImage, setFeaturedImage] = useState(post?.featuredImage || "");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [imageInputType, setImageInputType] = useState<"url" | "upload">("url");
   const [status, setStatus] = useState<PostStatus>(post?.status || "draft");
   const [content, setContent] = useState(post?.content || "");
 
@@ -141,87 +140,33 @@ export function PostForm({ segmentId, userId, userName, post }: PostFormProps) {
 
       {/* Featured Image */}
       <Box>
-        <Box as="label" id="image-input-type-label">
-          <Text variant="body-sm" semantic="secondary">
-            Featured Image
-          </Text>
-        </Box>
-        <Box
-          display="flex"
-          gap="md"
-          marginTop="2"
-          marginBottom="3"
-          role="radiogroup"
-          aria-labelledby="image-input-type-label"
-        >
-          <Box display="flex" alignItems="center" gap="sm">
-            <Radio
-              id="image-input-url"
-              name="image-input-type"
-              value="url"
-              checked={imageInputType === "url"}
-              onChange={() => setImageInputType("url")}
-              aria-label="Image URL"
-            />
-            <Text variant="body-sm">Image URL</Text>
-          </Box>
-          <Box display="flex" alignItems="center" gap="sm">
-            <Radio
-              id="image-input-upload"
-              name="image-input-type"
-              value="upload"
-              checked={imageInputType === "upload"}
-              onChange={() => setImageInputType("upload")}
-              aria-label="Upload Image"
-            />
-            <Text variant="body-sm">Upload Image</Text>
-          </Box>
-        </Box>
-
-        {imageInputType === "url" ? (
-          <Box>
-            <Input
-              key="image-url-input"
-              id="post-featured-image-url"
-              label="Image URL"
-              type="text"
-              placeholder="https://example.com/image.jpg"
-              value={featuredImage}
-              onChange={(e) => setFeaturedImage(e.target.value)}
-            />
-          </Box>
-        ) : (
-          <Box>
-            <Input
-              key="image-file-input"
-              id="post-featured-image-upload"
-              label="Upload Image File"
-              type="file"
-              accept="image/*"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  try {
-                    setIsUploadingImage(true);
-                    const path = `posts/${crypto.randomUUID()}-${file.name}`;
-                    const downloadURL = await uploadFile(path, file);
-                    setFeaturedImage(downloadURL);
-                    showSuccess("Image uploaded successfully");
-                  } catch (error) {
-                    console.error("Error uploading image:", error);
-                    showError("Failed to upload image. Please try again.");
-                  } finally {
-                    setIsUploadingImage(false);
-                  }
-                }
-              }}
-              disabled={isUploadingImage}
-            />
-            {isUploadingImage && (
-              <Box marginTop="1">
-                <Spinner size="sm" label="Uploading image..." />
-              </Box>
-            )}
+        <Input
+          id="post-featured-image-upload"
+          label="Featured Image"
+          type="file"
+          accept="image/*"
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              try {
+                setIsUploadingImage(true);
+                const path = `posts/${crypto.randomUUID()}-${file.name}`;
+                const downloadURL = await uploadFile(path, file);
+                setFeaturedImage(downloadURL);
+                showSuccess("Image uploaded successfully");
+              } catch (error) {
+                console.error("Error uploading image:", error);
+                showError("Failed to upload image. Please try again.");
+              } finally {
+                setIsUploadingImage(false);
+              }
+            }
+          }}
+          disabled={isUploadingImage}
+        />
+        {isUploadingImage && (
+          <Box marginTop="1">
+            <Spinner size="sm" label="Uploading image..." />
           </Box>
         )}
       </Box>

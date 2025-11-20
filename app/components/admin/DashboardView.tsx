@@ -12,24 +12,16 @@ import { useRouter } from "next/navigation";
 
 interface DashboardViewProps {
   hasPostsSegments: boolean;
-  hasFormSubmissions: boolean;
+  hasFormSegments: boolean;
 }
 
 const ADMIN_SECTIONS = [
   {
-    id: "pages",
-    label: "Pages",
-    description: "Manage your site pages",
-    icon: "📄",
-    href: "/admin/pages",
-    alwaysShow: true,
-  },
-  {
-    id: "segments",
-    label: "Segments",
-    description: "Create and manage content segments",
-    icon: "🧩",
-    href: "/admin/segments",
+    id: "site-builder",
+    label: "Site Builder",
+    description: "Build and design your site",
+    icon: "🏗️",
+    href: "/admin/site-builder",
     alwaysShow: true,
   },
   {
@@ -39,14 +31,6 @@ const ADMIN_SECTIONS = [
     icon: "📰",
     href: "/admin/posts",
     alwaysShow: false,
-  },
-  {
-    id: "navigation",
-    label: "Site Menu",
-    description: "Configure navigation menus",
-    icon: "🧭",
-    href: "/admin/navigation",
-    alwaysShow: true,
   },
   {
     id: "mailbox",
@@ -68,7 +52,7 @@ const ADMIN_SECTIONS = [
 
 export function DashboardView({
   hasPostsSegments,
-  hasFormSubmissions,
+  hasFormSegments,
 }: DashboardViewProps) {
   const router = useRouter();
 
@@ -76,7 +60,7 @@ export function DashboardView({
   const visibleSections = ADMIN_SECTIONS.filter((section) => {
     if (section.alwaysShow) return true;
     if (section.id === "posts") return hasPostsSegments;
-    if (section.id === "mailbox") return hasFormSubmissions;
+    if (section.id === "mailbox") return hasFormSegments;
     return true;
   });
 

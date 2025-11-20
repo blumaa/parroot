@@ -1,5 +1,6 @@
 import "./globals.css";
 import { ToastProvider } from "./providers/ToastProvider";
+import { QueryProvider } from "./providers/QueryProvider";
 import { getSiteSettings } from "./lib/data-access";
 import type { Metadata } from "next";
 
@@ -25,9 +26,11 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light">
       <body>
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        <QueryProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </QueryProvider>
       </body>
     </html>
   );

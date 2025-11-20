@@ -4,6 +4,8 @@ import { getAdminDb } from '@/app/lib/firebase-admin';
 import type { FormField } from '@/app/types';
 
 interface SubmitFormParams {
+  segmentId: string;
+  segmentName: string;
   formData: Record<string, string>;
   fields: FormField[];
   recipientEmail: string;
@@ -16,7 +18,7 @@ interface SubmitFormResult {
 
 export async function submitForm(params: SubmitFormParams): Promise<SubmitFormResult> {
   try {
-    const { formData, fields, recipientEmail } = params;
+    const { segmentId, segmentName, formData, fields, recipientEmail } = params;
 
     // Validate required fields
     for (const field of fields) {
@@ -49,6 +51,8 @@ export async function submitForm(params: SubmitFormParams): Promise<SubmitFormRe
     // Save to Firestore
     const db = getAdminDb();
     await db.collection('formSubmissions').add({
+      segmentId,
+      segmentName,
       data: labeledData,
       recipientEmail,
       submittedAt: new Date().toISOString(),

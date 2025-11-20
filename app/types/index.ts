@@ -45,7 +45,12 @@ export interface Page {
   slug: string;
   description?: string;
   status: 'draft' | 'published';
-  segments: string[]; // Array of segment IDs
+  // New: Three drop zones
+  headerSegmentId: string | null;
+  mainSegmentId: string | null;
+  footerSegmentId: string | null;
+  // Old: Keep for backward compatibility during migration
+  segments?: string[]; // Deprecated: Will be removed after migration
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
@@ -167,7 +172,6 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 export interface MenuItem {
   id: string;
   pageId: string;
-  label: string;
   parentId?: string; // Optional: ID of parent menu item for nested menus
   children?: MenuItem[]; // Computed field: nested children (not stored in DB)
   order: number;
@@ -185,6 +189,8 @@ export interface MenuItem {
 // ============================================
 export interface FormSubmission {
   id: string;
+  segmentId: string;
+  segmentName: string;
   data: Record<string, string>;
   recipientEmail: string;
   submittedAt: Date;

@@ -1,20 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Box, Heading, Text, Button, Spinner } from "@mond-design-system/theme";
 import {
   Input,
-  Accordion,
   Modal,
   ModalBody,
   ModalFooter,
 } from "@mond-design-system/theme/client";
 import { useToast } from "@/app/providers/ToastProvider";
 import { getFormSubmissionsAction, deleteFormSubmissionAction, markSubmissionAsReadAction } from "@/app/actions/mailbox";
-import type { FormSubmission } from "@/app/types";
+import { getSegmentsAction } from "@/app/actions/siteBuilderActions";
+import { MailboxCard } from "@/app/components/admin/MailboxCard";
+import type { FormSubmission, Segment } from "@/app/types";
 
 export default function MailboxPage() {
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
+  const [formSegments, setFormSegments] = useState<Segment[]>([]);
   const [filteredSubmissions, setFilteredSubmissions] = useState<
     FormSubmission[]
   >([]);
@@ -24,22 +26,40 @@ export default function MailboxPage() {
   const [openAccordionId, setOpenAccordionId] = useState<string | null>(null);
   const { showSuccess, showError } = useToast();
 
-  // Load submissions on mount
+  // Load submissions and form segments on mount
   useEffect(() => {
-    async function loadSubmissions() {
+    async function loadData() {
       setLoading(true);
       try {
-        const data = await getFormSubmissionsAction();
-        setSubmissions(data);
-        setFilteredSubmissions(data);
+        const [submissionsData, segmentsData] = await Promise.all([
+          getFormSubmissionsAction(),
+          getSegmentsAction(),
+        ]);
+
+        // Filter for published form segments only
+        const publishedFormSegments = segmentsData.filter(
+          (segment) => segment.type === 'form' && segment.status === 'published'
+        );
+        setFormSegments(publishedFormSegments);
+
+        // Create set of valid segment IDs
+        const validSegmentIds = new Set(publishedFormSegments.map(s => s.id));
+
+        // Filter submissions to only include those from published form segments
+        const validSubmissions = submissionsData.filter(
+          (submission) => validSegmentIds.has(submission.segmentId)
+        );
+
+        setSubmissions(validSubmissions);
+        setFilteredSubmissions(validSubmissions);
       } catch (error) {
-        console.error("Error loading submissions:", error);
+        console.error("Error loading data:", error);
         showError("Error", "Failed to load submissions");
       } finally {
         setLoading(false);
       }
     }
-    loadSubmissions();
+    loadData();
   }, [showError]);
 
   // Handle URL hash to auto-expand specific submission
@@ -93,11 +113,29 @@ export default function MailboxPage() {
   const handleRefresh = async () => {
     setLoading(true);
     try {
-      const data = await getFormSubmissionsAction();
-      setSubmissions(data);
-      setFilteredSubmissions(data);
+      const [submissionsData, segmentsData] = await Promise.all([
+        getFormSubmissionsAction(),
+        getSegmentsAction(),
+      ]);
+
+      // Filter for published form segments only
+      const publishedFormSegments = segmentsData.filter(
+        (segment) => segment.type === 'form' && segment.status === 'published'
+      );
+      setFormSegments(publishedFormSegments);
+
+      // Create set of valid segment IDs
+      const validSegmentIds = new Set(publishedFormSegments.map(s => s.id));
+
+      // Filter submissions to only include those from published form segments
+      const validSubmissions = submissionsData.filter(
+        (submission) => validSegmentIds.has(submission.segmentId)
+      );
+
+      setSubmissions(validSubmissions);
+      setFilteredSubmissions(validSubmissions);
     } catch (error) {
-      console.error("Error loading submissions:", error);
+      console.error("Error loading data:", error);
       showError("Error", "Failed to load submissions");
     } finally {
       setLoading(false);
@@ -120,10 +158,6 @@ export default function MailboxPage() {
     }
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleString();
-  };
-
   const handleMarkAsRead = async (id: string) => {
     try {
       const result = await markSubmissionAsReadAction(id);
@@ -138,58 +172,17 @@ export default function MailboxPage() {
     }
   };
 
-  const getSubmissionTitle = (submission: FormSubmission) => {
-    const firstField = Object.entries(submission.data)[0];
-    const preview = firstField
-      ? `${firstField[0]}: ${firstField[1]}`
-      : "Form Submission";
-    const date = formatDate(submission.submittedAt);
-
-    return (
-      <Box display="flex" alignItems="center" gap="sm" justifyContent="space-between" width="full">
-        <Text variant="body">{`${date} - ${preview}`}</Text>
-        {!submission.read && (
-          <Box as="span" display="inline-block">
-            <svg width="8" height="8" viewBox="0 0 8 8">
-              <circle cx="4" cy="4" r="4" fill="#10b981" />
-            </svg>
-          </Box>
-        )}
-      </Box>
-    );
-  };
-
-  const accordionItems = filteredSubmissions.map((submission) => ({
-    id: submission.id,
-    title: getSubmissionTitle(submission),
-    content: (
-      <Box display="flex" flexDirection="column" gap="md">
-        {/* Submission Data */}
-        <Box display="flex" gap="sm" justifyContent="space-between">
-          <Box>
-            {Object.entries(submission.data).map(([label, value]) => (
-              <Box key={label} marginBottom="2" gap="sm" display="flex">
-                <Text variant="body-sm" weight="bold">
-                  {label}:
-                </Text>
-                <Text variant="body">{String(value) || "(empty)"}</Text>
-              </Box>
-            ))}
-          </Box>
-          {/* Delete Button */}
-          <Box>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setDeleteConfirm(submission.id)}
-            >
-              Delete Submission
-            </Button>
-          </Box>
-        </Box>
-      </Box>
-    ),
-  }));
+  // Group submissions by segment ID
+  const submissionsBySegment = useMemo(() => {
+    return filteredSubmissions.reduce((acc, submission) => {
+      const segmentId = submission.segmentId || 'unknown';
+      if (!acc[segmentId]) {
+        acc[segmentId] = [];
+      }
+      acc[segmentId].push(submission);
+      return acc;
+    }, {} as Record<string, FormSubmission[]>);
+  }, [filteredSubmissions]);
 
   return (
     <Box display="flex" flexDirection="column" gap="lg" padding="6">
@@ -222,6 +215,12 @@ export default function MailboxPage() {
         <Box padding="8" display="flex" justifyContent="center">
           <Spinner size="lg" label="Loading submissions..." />
         </Box>
+      ) : formSegments.length === 0 ? (
+        <Box padding="8" display="flex" justifyContent="center">
+          <Text variant="body" semantic="secondary">
+            No form segments found. Create a form segment in the Site Builder to receive submissions.
+          </Text>
+        </Box>
       ) : filteredSubmissions.length === 0 ? (
         <Box padding="8" display="flex" justifyContent="center">
           <Text variant="body" semantic="secondary">
@@ -231,23 +230,24 @@ export default function MailboxPage() {
           </Text>
         </Box>
       ) : (
-        <Accordion
-          items={accordionItems}
-          mode="single"
-          variant="bordered"
-          expandedIds={openAccordionId ? [openAccordionId] : []}
-          onExpandedChange={(expandedIds) => {
-            setOpenAccordionId(expandedIds && expandedIds.length > 0 ? expandedIds[0] : null);
-            // Mark submission as read when accordion item is opened
-            if (expandedIds && expandedIds.length > 0) {
-              const openedId = expandedIds[0];
-              const submission = filteredSubmissions.find(s => s.id === openedId);
-              if (submission && !submission.read) {
-                handleMarkAsRead(openedId);
-              }
-            }
-          }}
-        />
+        <Box display="flex" flexDirection="column" gap="lg">
+          {formSegments.map((segment) => {
+            const segmentSubmissions = submissionsBySegment[segment.id] || [];
+
+            return (
+              <MailboxCard
+                key={segment.id}
+                segmentId={segment.id}
+                segmentName={segment.name}
+                submissions={segmentSubmissions}
+                openAccordionId={openAccordionId}
+                onAccordionChange={setOpenAccordionId}
+                onMarkAsRead={handleMarkAsRead}
+                onDelete={(id) => setDeleteConfirm(id)}
+              />
+            );
+          })}
+        </Box>
       )}
 
       {/* Stats */}

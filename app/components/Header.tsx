@@ -23,6 +23,10 @@ interface HeaderProps {
   logoSize?: AvatarSize;
   stickyHeader?: boolean;
   siteNameSize?: HeadingSize;
+  isPreview?: boolean;
+  onPageSelect?: (pageId: string) => void;
+  selectedPageId?: string | null;
+  hasFormSegments?: boolean;
 }
 
 export function Header({
@@ -34,6 +38,10 @@ export function Header({
   logoSize = "2xl",
   stickyHeader = false,
   siteNameSize = "md",
+  isPreview = false,
+  onPageSelect,
+  selectedPageId,
+  hasFormSegments = false,
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
@@ -63,9 +71,10 @@ export function Header({
     const visibleChildren = getVisibleChildren(item);
     const hasSubmenu = visibleChildren.length > 0;
 
+    const isSelected = selectedPageId === page.id;
+
     if (hasSubmenu) {
-      // Menu item with submenu - wrap the link in a popover
-      // The popover triggers on hover, but click still navigates
+      // Menu item with submenu - wrap the button in a popover
       return (
         <Popover
           key={item.id}
@@ -78,6 +87,24 @@ export function Header({
               {visibleChildren.map((child) => {
                 const childPage = getPage(child);
                 if (!childPage) return null;
+                const isChildSelected = selectedPageId === childPage.id;
+
+                if (isPreview) {
+                  return (
+                    <Button
+                      key={child.id}
+                      variant={isChildSelected ? 'primary' : child.variant}
+                      size={child.size}
+                      fullWidth
+                      onClick={() => {
+                        onPageSelect?.(childPage.id);
+                        setOpenSubmenu(null);
+                      }}
+                    >
+                      {childPage.title}
+                    </Button>
+                  );
+                }
 
                 return (
                   <Link
@@ -95,16 +122,39 @@ export function Header({
             </Box>
           }
         >
-          <Link href={`/${page.slug}`} className="no-underline">
-            <Button variant={item.variant} size={item.size}>
+          {isPreview ? (
+            <Button
+              variant={isSelected ? 'primary' : item.variant}
+              size={item.size}
+              onClick={() => onPageSelect?.(page.id)}
+            >
               {page.title}
             </Button>
-          </Link>
+          ) : (
+            <Link href={`/${page.slug}`} className="no-underline">
+              <Button variant={item.variant} size={item.size}>
+                {page.title}
+              </Button>
+            </Link>
+          )}
         </Popover>
       );
     }
 
     // Regular menu item without submenu
+    if (isPreview) {
+      return (
+        <Button
+          key={item.id}
+          variant={isSelected ? 'primary' : item.variant}
+          size={item.size}
+          onClick={() => onPageSelect?.(page.id)}
+        >
+          {page.title}
+        </Button>
+      );
+    }
+
     return (
       <Link key={item.id} href={`/${page.slug}`} className="no-underline">
         <Button variant={item.variant} size={item.size}>
@@ -121,24 +171,57 @@ export function Header({
 
     const visibleChildren = getVisibleChildren(item);
     const hasSubmenu = visibleChildren.length > 0;
+    const isSelected = selectedPageId === page.id;
 
     if (hasSubmenu) {
       // Menu item with submenu - show parent + indented children
       return (
         <Box key={item.id} display="flex" flexDirection="column" gap="xs">
-          <Link
-            href={`/${page.slug}`}
-            className="no-underline"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            <Button variant={item.variant} size={item.size} fullWidth>
+          {isPreview ? (
+            <Button
+              variant={isSelected ? 'primary' : item.variant}
+              size={item.size}
+              fullWidth
+              onClick={() => {
+                onPageSelect?.(page.id);
+                setMobileMenuOpen(false);
+              }}
+            >
               {page.title}
             </Button>
-          </Link>
+          ) : (
+            <Link
+              href={`/${page.slug}`}
+              className="no-underline"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Button variant={item.variant} size={item.size} fullWidth>
+                {page.title}
+              </Button>
+            </Link>
+          )}
           <Box paddingLeft="4" display="flex" flexDirection="column" gap="xs">
             {visibleChildren.map((child) => {
               const childPage = getPage(child);
               if (!childPage) return null;
+              const isChildSelected = selectedPageId === childPage.id;
+
+              if (isPreview) {
+                return (
+                  <Button
+                    key={child.id}
+                    variant={isChildSelected ? 'primary' : child.variant}
+                    size={child.size}
+                    fullWidth
+                    onClick={() => {
+                      onPageSelect?.(childPage.id);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    {childPage.title}
+                  </Button>
+                );
+              }
 
               return (
                 <Link
@@ -159,6 +242,23 @@ export function Header({
     }
 
     // Regular menu item without submenu
+    if (isPreview) {
+      return (
+        <Button
+          key={item.id}
+          variant={isSelected ? 'primary' : item.variant}
+          size={item.size}
+          fullWidth
+          onClick={() => {
+            onPageSelect?.(page.id);
+            setMobileMenuOpen(false);
+          }}
+        >
+          {page.title}
+        </Button>
+      );
+    }
+
     return (
       <Link
         key={item.id}
@@ -212,7 +312,7 @@ export function Header({
             <Box as="nav" display="flex" gap="xs">
               {visibleItems.map(renderDesktopMenuItem)}
             </Box>
-            <HeaderAdminArea user={user} />
+            <HeaderAdminArea user={user} hasFormSegments={hasFormSegments} />
           </Box>
 
           {/* Mobile: Hamburger Button */}
@@ -269,7 +369,7 @@ export function Header({
         width="md"
       >
         <DrawerHeader onClose={() => setMobileMenuOpen(false)}>
-          <HeaderAdminArea user={user} />
+          <HeaderAdminArea user={user} hasFormSegments={hasFormSegments} />
         </DrawerHeader>
         <DrawerBody>
           <Box display="flex" flexDirection="column" gap="lg">

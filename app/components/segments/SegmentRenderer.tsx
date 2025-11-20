@@ -70,7 +70,7 @@ export function SegmentRenderer({
       return <PlaceholderSegment type="Team" segmentName={segment.name} />;
 
     case "form":
-      return <FormSegmentRenderer content={content} />;
+      return <FormSegmentRenderer segmentId={segment.id} segmentName={segment.name} content={content} />;
 
     case "posts":
       return <PostsSegmentRenderer posts={posts || []} content={content} />;

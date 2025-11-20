@@ -2,7 +2,6 @@ import { unstable_noStore as noStore } from 'next/cache';
 import { getUser } from '@/app/lib/dal';
 import { redirect } from 'next/navigation';
 import { getSegments } from '@/app/lib/data-access';
-import { getAdminDb } from '@/app/lib/firebase-admin';
 import { DashboardView } from '@/app/components/admin/DashboardView';
 
 export default async function DashboardPage() {
@@ -20,18 +19,15 @@ export default async function DashboardPage() {
     (segment) => segment.type === 'posts'
   );
 
-  // Check if there are any form submissions
-  const db = getAdminDb();
-  const submissionsSnapshot = await db
-    .collection('formSubmissions')
-    .limit(1)
-    .get();
-  const hasFormSubmissions = !submissionsSnapshot.empty;
+  // Check if there are any form segments
+  const hasFormSegments = allSegments.some(
+    (segment) => segment.type === 'form'
+  );
 
   return (
     <DashboardView
       hasPostsSegments={hasPostsSegments}
-      hasFormSubmissions={hasFormSubmissions}
+      hasFormSegments={hasFormSegments}
     />
   );
 }

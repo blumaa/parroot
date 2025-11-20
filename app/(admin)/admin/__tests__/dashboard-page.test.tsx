@@ -15,22 +15,22 @@ vi.mock('next/navigation', () => ({
 
 describe('DashboardView', () => {
   it('renders Dashboard title', () => {
-    render(<DashboardView hasPostsSegments={false} hasFormSubmissions={false} />);
+    render(<DashboardView hasPostsSegments={false} hasFormSegments={false} />);
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
   it('shows Posts card when posts segments exist', () => {
-    render(<DashboardView hasPostsSegments={true} hasFormSubmissions={false} />);
+    render(<DashboardView hasPostsSegments={true} hasFormSegments={false} />);
     expect(screen.getByText('Posts')).toBeInTheDocument();
   });
 
-  it('shows Mailbox card when form submissions exist', () => {
-    render(<DashboardView hasPostsSegments={false} hasFormSubmissions={true} />);
+  it('shows Mailbox card when form segments exist', () => {
+    render(<DashboardView hasPostsSegments={false} hasFormSegments={true} />);
     expect(screen.getByText('Mailbox')).toBeInTheDocument();
   });
 
   it('hides Posts card when no posts segments', () => {
-    render(<DashboardView hasPostsSegments={false} hasFormSubmissions={false} />);
+    render(<DashboardView hasPostsSegments={false} hasFormSegments={false} />);
     expect(screen.queryByText('Posts')).not.toBeInTheDocument();
   });
 });

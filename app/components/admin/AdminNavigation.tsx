@@ -19,10 +19,8 @@ export function AdminNavigation({
 
   const allNavItems = [
     { label: 'Dashboard', href: '/admin', alwaysShow: true },
-    { label: 'Pages', href: '/admin/pages', alwaysShow: true },
-    { label: 'Segments', href: '/admin/segments', alwaysShow: true },
+    { label: 'Site Builder', href: '/admin/site-builder', alwaysShow: true },
     { label: 'Posts', href: '/admin/posts', alwaysShow: false, condition: hasPostsSegments },
-    { label: 'Site Menu', href: '/admin/navigation', alwaysShow: true },
     { label: 'Mailbox', href: '/admin/mailbox', alwaysShow: false, condition: hasFormSubmissions },
     { label: 'Site Settings', href: '/admin/settings', alwaysShow: true },
   ];

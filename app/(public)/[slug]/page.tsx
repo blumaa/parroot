@@ -29,11 +29,15 @@ export default async function DynamicPage({ params }: PageProps) {
     notFound();
   }
 
-  // Fetch segments for this page
-  const segments = await getSegmentsByIds(page.segments);
+  // Get segment IDs - support both old and new format
+  const segmentIds = page.segments ||
+    [page.headerSegmentId, page.mainSegmentId, page.footerSegmentId].filter((id): id is string => id !== null);
 
-  // Filter segments to only show published ones and maintain order from page.segments
-  const publishedSegments = page.segments
+  // Fetch segments for this page
+  const segments = await getSegmentsByIds(segmentIds);
+
+  // Filter segments to only show published ones and maintain order
+  const publishedSegments = segmentIds
     .map((segmentId: string) => segments.find((s) => s.id === segmentId))
     .filter((segment: Segment | undefined): segment is Segment =>
       segment !== undefined && segment.status === 'published'

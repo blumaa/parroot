@@ -9,7 +9,7 @@ import {
   Spinner,
   Divider,
 } from "@mond-design-system/theme";
-import { Input, Select, Switch, Radio } from "@mond-design-system/theme/client";
+import { Input, Select, Switch } from "@mond-design-system/theme/client";
 import type { SiteSettings } from "@/app/types";
 import { updateSettings } from "@/app/actions/settings";
 import { uploadFile } from "@/app/utils/storage";
@@ -37,14 +37,10 @@ export function SettingsForm({ settings }: SettingsFormProps) {
   const [logoSize, setLogoSize] = useState<string>(
     settings.logoSize || "2xl",
   );
-  const [logoInputType, setLogoInputType] = useState<"url" | "upload">("url");
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   // Favicon state
   const [faviconUrl, setFaviconUrl] = useState(settings.faviconUrl || "");
-  const [faviconInputType, setFaviconInputType] = useState<"url" | "upload">(
-    "url",
-  );
   const [isUploadingFavicon, setIsUploadingFavicon] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -154,97 +150,49 @@ export function SettingsForm({ settings }: SettingsFormProps) {
             >
               {/* Logo */}
               <Box>
-                <Box as="label" id="logo-input-type-label">
+                <Box as="label">
                   <Text semantic="secondary">Logo</Text>
-                </Box>
-                <Box
-                  display="flex"
-                  gap="md"
-                  marginTop="2"
-                  marginBottom="3"
-                  role="radiogroup"
-                  aria-labelledby="logo-input-type-label"
-                >
-                  <Box display="flex" alignItems="center" gap="sm">
-                    <Radio
-                      id="logo-input-url"
-                      name="logo-input-type"
-                      value="url"
-                      checked={logoInputType === "url"}
-                      onChange={() => setLogoInputType("url")}
-                      aria-label="Logo URL"
-                    />
-                    <Text variant="body-sm">Image URL</Text>
-                  </Box>
-                  <Box display="flex" alignItems="center" gap="sm">
-                    <Radio
-                      id="logo-input-upload"
-                      name="logo-input-type"
-                      value="upload"
-                      checked={logoInputType === "upload"}
-                      onChange={() => setLogoInputType("upload")}
-                      aria-label="Upload Logo"
-                    />
-                    <Text variant="body-sm">Upload Image</Text>
-                  </Box>
                 </Box>
 
                 <Box display="flex">
                   <Box display="flex" gap="md">
-                    {logoInputType === "url" ? (
-                      <Box>
-                        <Input
-                          key="logo-url-input"
-                          id="logoUrl"
-                          name="logoUrl"
-                          label="Logo URL"
-                          type="text"
-                          placeholder="https://example.com/logo.png"
-                          value={logoUrl}
-                          onChange={(e) => setLogoUrl(e.target.value)}
-                          helperText="URL to your site logo image"
-                        />
-                      </Box>
-                    ) : (
-                      <Box>
-                        <Input
-                          key="logo-file-input"
-                          id="logo-upload"
-                          label="Upload Logo File"
-                          type="file"
-                          accept="image/*"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              try {
-                                setIsUploadingLogo(true);
-                                const path = `settings/logo-${crypto.randomUUID()}-${file.name}`;
-                                const downloadURL = await uploadFile(
-                                  path,
-                                  file,
-                                );
-                                setLogoUrl(downloadURL);
-                                showSuccess("Logo uploaded successfully");
-                              } catch (error) {
-                                console.error("Error uploading logo:", error);
-                                showError(
-                                  "Failed to upload logo. Please try again.",
-                                );
-                              } finally {
-                                setIsUploadingLogo(false);
-                              }
+                    <Box>
+                      <Input
+                        id="logo-upload"
+                        label="Upload Logo File"
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            try {
+                              setIsUploadingLogo(true);
+                              const path = `settings/logo-${crypto.randomUUID()}-${file.name}`;
+                              const downloadURL = await uploadFile(
+                                path,
+                                file,
+                              );
+                              setLogoUrl(downloadURL);
+                              showSuccess("Logo uploaded successfully");
+                            } catch (error) {
+                              console.error("Error uploading logo:", error);
+                              showError(
+                                "Failed to upload logo. Please try again.",
+                              );
+                            } finally {
+                              setIsUploadingLogo(false);
                             }
-                          }}
-                          disabled={isUploadingLogo}
-                        />
-                        {isUploadingLogo && (
-                          <Box marginTop="1">
-                            <Spinner size="sm" label="Uploading logo..." />
-                          </Box>
-                        )}
-                        <input type="hidden" name="logoUrl" value={logoUrl} />
-                      </Box>
-                    )}
+                          }
+                        }}
+                        disabled={isUploadingLogo}
+                      />
+                      {isUploadingLogo && (
+                        <Box marginTop="1">
+                          <Spinner size="sm" label="Uploading logo..." />
+                        </Box>
+                      )}
+                      <input type="hidden" name="logoUrl" value={logoUrl} />
+                    </Box>
 
                     {/* Logo Preview */}
                     {logoUrl && (
@@ -274,104 +222,55 @@ export function SettingsForm({ settings }: SettingsFormProps) {
               <Box>
                 {/* Favicon */}
                 <Box>
-                  <Box as="label" id="favicon-input-type-label">
+                  <Box as="label">
                     <Text semantic="secondary">Favicon</Text>
-                  </Box>
-                  <Box
-                    display="flex"
-                    gap="md"
-                    marginTop="2"
-                    marginBottom="3"
-                    role="radiogroup"
-                    aria-labelledby="favicon-input-type-label"
-                  >
-                    <Box display="flex" alignItems="center" gap="sm">
-                      <Radio
-                        id="favicon-input-url"
-                        name="favicon-input-type"
-                        value="url"
-                        checked={faviconInputType === "url"}
-                        onChange={() => setFaviconInputType("url")}
-                        aria-label="Favicon URL"
-                      />
-                      <Text variant="body-sm">Image URL</Text>
-                    </Box>
-                    <Box display="flex" alignItems="center" gap="sm">
-                      <Radio
-                        id="favicon-input-upload"
-                        name="favicon-input-type"
-                        value="upload"
-                        checked={faviconInputType === "upload"}
-                        onChange={() => setFaviconInputType("upload")}
-                        aria-label="Upload Favicon"
-                      />
-                      <Text variant="body-sm">Upload Image</Text>
-                    </Box>
                   </Box>
 
                   <Box display="flex" gap="md" alignItems="flex-start">
                     <Box>
-                      {faviconInputType === "url" ? (
-                        <Box>
-                          <Input
-                            key="favicon-url-input"
-                            id="faviconUrl"
-                            name="faviconUrl"
-                            label="Favicon URL"
-                            type="text"
-                            placeholder="https://example.com/favicon.ico"
-                            value={faviconUrl}
-                            onChange={(e) => setFaviconUrl(e.target.value)}
-                            helperText="URL to your site favicon (.ico, .png, or .svg)"
-                          />
-                        </Box>
-                      ) : (
-                        <Box>
-                          <Input
-                            key="favicon-file-input"
-                            id="favicon-upload"
-                            label="Upload Favicon File"
-                            type="file"
-                            accept=".ico,.png,.svg,image/x-icon,image/png,image/svg+xml"
-                            onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                try {
-                                  setIsUploadingFavicon(true);
-                                  const path = `settings/favicon-${crypto.randomUUID()}-${file.name}`;
-                                  const downloadURL = await uploadFile(
-                                    path,
-                                    file,
-                                  );
-                                  setFaviconUrl(downloadURL);
-                                  showSuccess("Favicon uploaded successfully");
-                                } catch (error) {
-                                  console.error(
-                                    "Error uploading favicon:",
-                                    error,
-                                  );
-                                  showError(
-                                    "Failed to upload favicon. Please try again.",
-                                  );
-                                } finally {
-                                  setIsUploadingFavicon(false);
-                                }
-                              }
-                            }}
-                            disabled={isUploadingFavicon}
-                          />
-                          {isUploadingFavicon && (
-                            <Box marginTop="1">
-                              <Spinner size="sm" label="Uploading favicon..." />
-                            </Box>
-                          )}
-                          <input
-                            type="hidden"
-                            name="faviconUrl"
-                            value={faviconUrl}
-                          />
+                      <Input
+                        id="favicon-upload"
+                        label="Upload Favicon File"
+                        type="file"
+                        accept=".ico,.png,.svg,image/x-icon,image/png,image/svg+xml"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            try {
+                              setIsUploadingFavicon(true);
+                              const path = `settings/favicon-${crypto.randomUUID()}-${file.name}`;
+                              const downloadURL = await uploadFile(
+                                path,
+                                file,
+                              );
+                              setFaviconUrl(downloadURL);
+                              showSuccess("Favicon uploaded successfully");
+                            } catch (error) {
+                              console.error(
+                                "Error uploading favicon:",
+                                error,
+                              );
+                              showError(
+                                "Failed to upload favicon. Please try again.",
+                              );
+                            } finally {
+                              setIsUploadingFavicon(false);
+                            }
+                          }
+                        }}
+                        disabled={isUploadingFavicon}
+                        helperText=".ico, .png, or .svg"
+                      />
+                      {isUploadingFavicon && (
+                        <Box marginTop="1">
+                          <Spinner size="sm" label="Uploading favicon..." />
                         </Box>
                       )}
+                      <input
+                        type="hidden"
+                        name="faviconUrl"
+                        value={faviconUrl}
+                      />
                     </Box>
 
                     {/* Favicon Preview */}

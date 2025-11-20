@@ -8,11 +8,13 @@ import { submitForm } from "@/app/actions/form-submission";
 import { useToast } from "@/app/providers/ToastProvider";
 
 interface FormSegmentRendererProps {
+  segmentId?: string;
+  segmentName?: string;
   content: Record<string, unknown>;
   isPreview?: boolean;
 }
 
-export function FormSegmentRenderer({ content, isPreview = false }: FormSegmentRendererProps) {
+export function FormSegmentRenderer({ segmentId, segmentName, content, isPreview = false }: FormSegmentRendererProps) {
   const formContent = content as Partial<FormContent>;
   const fields = formContent.fields || [];
   const { showSuccess, showError } = useToast();
@@ -49,6 +51,8 @@ export function FormSegmentRenderer({ content, isPreview = false }: FormSegmentR
 
     try {
       const result = await submitForm({
+        segmentId: segmentId || '',
+        segmentName: segmentName || 'Unknown Form',
         formData,
         fields,
         recipientEmail: formContent.recipientEmail || '',
@@ -78,10 +82,12 @@ export function FormSegmentRenderer({ content, isPreview = false }: FormSegmentR
     switch (field.type) {
       case 'text':
         return (
-          <Box key={field.id}>
+          <Box key={field.id} as="label" display="flex" flexDirection="column" gap="xs">
+            <Text variant="body-sm" weight="medium">
+              {field.label}
+            </Text>
             <Input
               id={field.id}
-              label={field.label}
               type="text"
               placeholder={field.placeholder}
               value={value}
@@ -93,10 +99,12 @@ export function FormSegmentRenderer({ content, isPreview = false }: FormSegmentR
 
       case 'email':
         return (
-          <Box key={field.id}>
+          <Box key={field.id} as="label" display="flex" flexDirection="column" gap="xs">
+            <Text variant="body-sm" weight="medium">
+              {field.label}
+            </Text>
             <Input
               id={field.id}
-              label={field.label}
               type="email"
               placeholder={field.placeholder}
               value={value}
@@ -108,10 +116,12 @@ export function FormSegmentRenderer({ content, isPreview = false }: FormSegmentR
 
       case 'phone':
         return (
-          <Box key={field.id}>
+          <Box key={field.id} as="label" display="flex" flexDirection="column" gap="xs">
+            <Text variant="body-sm" weight="medium">
+              {field.label}
+            </Text>
             <Input
               id={field.id}
-              label={field.label}
               type="tel"
               placeholder={field.placeholder}
               value={value}
@@ -123,10 +133,12 @@ export function FormSegmentRenderer({ content, isPreview = false }: FormSegmentR
 
       case 'textarea':
         return (
-          <Box key={field.id}>
+          <Box key={field.id} as="label" display="flex" flexDirection="column" gap="xs">
+            <Text variant="body-sm" weight="medium">
+              {field.label}
+            </Text>
             <Textarea
               id={field.id}
-              label={field.label}
               placeholder={field.placeholder}
               value={value}
               onChange={(e) => handleChange(field.id, e.target.value)}
