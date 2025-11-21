@@ -183,7 +183,7 @@ export function FormSegmentForm({
             flexDirection="column"
             gap="sm"
             border="default"
-            corners="default"
+            corners="rounded-lg"
           >
             <Box display="flex" justifyContent="space-between" alignItems="center">
               <Text variant="body-sm" weight="medium">
@@ -307,7 +307,7 @@ export function FormSegmentForm({
             <Box
               padding="4"
               border="default"
-              corners="default"
+              corners="rounded-lg"
             >
               <FormSegmentRenderer content={content} isPreview={true} />
             </Box>

@@ -70,7 +70,7 @@ export function SitePreviewHeader() {
             onClick={handleSave}
             loading={saving}
             disabled={!hasUnsavedChanges}
-            corners="rounded"
+            corners="rounded-lg"
           >
             {hasUnsavedChanges ? "Save Changes" : "Saved"}
           </Button>
@@ -79,7 +79,7 @@ export function SitePreviewHeader() {
           variant="primary"
           size="sm"
           onClick={openMenuSettings}
-          corners="rounded"
+          corners="rounded-lg"
         >
           Menu Settings
         </Button>

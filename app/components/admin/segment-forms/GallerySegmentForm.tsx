@@ -176,7 +176,7 @@ export function GallerySegmentForm({
                 key={image.id}
                 padding="3"
                 border="default"
-                corners="default"
+                corners="rounded-lg"
               >
                 <Box
                   display="flex"

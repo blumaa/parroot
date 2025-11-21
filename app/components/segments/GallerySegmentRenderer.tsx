@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Box, Text, Button } from "@mond-design-system/theme";
+import { useState, useCallback, useEffect } from "react";
+import { Box, Text } from "@mond-design-system/theme";
 import Image from "next/image";
 import type { GalleryImage } from "@/app/types";
+import { GalleryLightBox } from "./GalleryLightBox";
 import "./GallerySegmentRenderer.css";
 
 interface GallerySegmentRendererProps {
@@ -59,7 +60,12 @@ export function GallerySegmentRenderer({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedImageIndex, handleCloseLightbox, handlePreviousImage, handleNextImage]);
+  }, [
+    selectedImageIndex,
+    handleCloseLightbox,
+    handlePreviousImage,
+    handleNextImage,
+  ]);
 
   // Handle empty state
   if (!images || images.length === 0) {
@@ -95,7 +101,10 @@ export function GallerySegmentRenderer({
         role="region"
         aria-label="Gallery"
       >
-        <div
+        <Box
+          display="grid"
+          gap="md"
+          width="full"
           className="gallery-grid"
           data-images-per-row={actualColumns}
           data-row-count={rowCount}
@@ -107,6 +116,8 @@ export function GallerySegmentRenderer({
               display="flex"
               flexDirection="column"
               gap="sm"
+              border="default"
+              padding="2"
               onClick={() => handleImageClick(index)}
             >
               <div
@@ -115,7 +126,8 @@ export function GallerySegmentRenderer({
                   width: "100%",
                   aspectRatio: "4 / 3",
                   overflow: "hidden",
-                  borderRadius: "var(--mond-radius-md)",
+                  cursor: "pointer",
+                  // borderRadius: "var(--mond-radius-md)",
                 }}
               >
                 <Image
@@ -126,7 +138,7 @@ export function GallerySegmentRenderer({
                   style={{
                     width: "100%",
                     height: "100%",
-                    objectFit: "cover",
+                    objectFit: "contain",
                   }}
                 />
               </div>
@@ -137,96 +149,17 @@ export function GallerySegmentRenderer({
               )}
             </Box>
           ))}
-        </div>
+        </Box>
       </Box>
 
-      {/* Lightbox Overlay */}
-      {selectedImageIndex !== null && (
-        <div
-          className="lightbox-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Image lightbox"
-          onClick={handleCloseLightbox}
-        >
-          {/* Close Button */}
-          <div className="lightbox-button close">
-            <Button
-              variant="ghost"
-              size="lg"
-              onClick={handleCloseLightbox}
-              aria-label="Close lightbox"
-            >
-              ×
-            </Button>
-          </div>
-
-          {/* Previous Button */}
-          {images.length > 1 && (
-            <div className="lightbox-button prev">
-              <Button
-                variant="ghost"
-                size="lg"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePreviousImage();
-                }}
-                aria-label="Previous image"
-              >
-                ‹
-              </Button>
-            </div>
-          )}
-
-          {/* Image */}
-          <div
-            className="lightbox-image-container"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={images[selectedImageIndex].imageUrl}
-              alt={
-                images[selectedImageIndex].alt ||
-                images[selectedImageIndex].caption ||
-                "Gallery image"
-              }
-              width={1200}
-              height={900}
-              style={{
-                maxWidth: "100%",
-                maxHeight: "90vh",
-                objectFit: "contain",
-              }}
-            />
-            {images[selectedImageIndex].caption && (
-              <Box marginTop="4" display="flex" justifyContent="center">
-                <div className="caption-white">
-                  <Text variant="body">
-                    {images[selectedImageIndex].caption}
-                  </Text>
-                </div>
-              </Box>
-            )}
-          </div>
-
-          {/* Next Button */}
-          {images.length > 1 && (
-            <div className="lightbox-button next">
-              <Button
-                variant="ghost"
-                size="lg"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleNextImage();
-                }}
-                aria-label="Next image"
-              >
-                ›
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
+      <GalleryLightBox
+        isOpen={selectedImageIndex !== null}
+        onClose={handleCloseLightbox}
+        images={validImages}
+        currentIndex={selectedImageIndex ?? 0}
+        onNext={handleNextImage}
+        onPrevious={handlePreviousImage}
+      />
     </>
   );
 }

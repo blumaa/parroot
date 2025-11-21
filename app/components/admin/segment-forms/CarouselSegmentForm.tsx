@@ -154,7 +154,7 @@ export function CarouselSegmentForm({
               key={slide.id}
               padding="4"
               border="default"
-              corners="default"
+              corners="rounded-lg"
             >
               <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="3">
                 <Heading level={4}>Slide {index + 1}</Heading>

@@ -70,7 +70,7 @@ export function PostsSegmentRenderer({
                 <Box display="flex" gap="md">
                   {/* Featured Image */}
                   {post.featuredImage && (
-                    <Box corners="rounded">
+                    <Box corners="rounded-lg">
                       <Image
                         src={post.featuredImage}
                         alt={post.title}

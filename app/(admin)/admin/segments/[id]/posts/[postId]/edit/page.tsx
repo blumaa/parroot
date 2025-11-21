@@ -22,7 +22,7 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
   }
 
   if (segment.type !== 'posts') {
-    redirect('/admin/segments');
+    redirect('/admin/site-builder');
   }
 
   // Get the post
@@ -33,7 +33,7 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
 
   // Verify post belongs to this segment
   if (post.segmentId !== segmentId) {
-    redirect('/admin/segments');
+    redirect('/admin/site-builder');
   }
 
   return (

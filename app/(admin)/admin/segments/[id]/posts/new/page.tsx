@@ -22,7 +22,7 @@ export default async function NewPostPage({ params }: NewPostPageProps) {
   }
 
   if (segment.type !== 'posts') {
-    redirect('/admin/segments');
+    redirect('/admin/site-builder');
   }
 
   return (

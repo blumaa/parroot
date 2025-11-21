@@ -22,7 +22,7 @@ export default async function PostsPage({ params }: PostsPageProps) {
   }
 
   if (segment.type !== 'posts') {
-    redirect('/admin/segments');
+    redirect('/admin/site-builder');
   }
 
   return <PostList segmentId={segmentId} segmentName={segment.name} />;
